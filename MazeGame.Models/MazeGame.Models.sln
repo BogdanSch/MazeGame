@@ -1,0 +1,37 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.13.35919.96
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MazeGame.Models", "MazeGame.Models.csproj", "{1065FA01-CD7D-47E1-93E4-0A4BD12039F3}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MazeGame.Console", "..\MazeGame.Console\MazeGame.Console.csproj", "{7695AF7C-4B49-43FD-97AF-A6B837CF6664}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MazeGame.Logic", "..\MazeGame.Logic\MazeGame.Logic.csproj", "{5F21342F-61CF-41A9-98C0-5635AD08F50B}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{1065FA01-CD7D-47E1-93E4-0A4BD12039F3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1065FA01-CD7D-47E1-93E4-0A4BD12039F3}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1065FA01-CD7D-47E1-93E4-0A4BD12039F3}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1065FA01-CD7D-47E1-93E4-0A4BD12039F3}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7695AF7C-4B49-43FD-97AF-A6B837CF6664}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7695AF7C-4B49-43FD-97AF-A6B837CF6664}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7695AF7C-4B49-43FD-97AF-A6B837CF6664}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7695AF7C-4B49-43FD-97AF-A6B837CF6664}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5F21342F-61CF-41A9-98C0-5635AD08F50B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5F21342F-61CF-41A9-98C0-5635AD08F50B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5F21342F-61CF-41A9-98C0-5635AD08F50B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5F21342F-61CF-41A9-98C0-5635AD08F50B}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {FB20C8E5-1C5F-4520-94D4-EBCAF46F7386}
+	EndGlobalSection
+EndGlobal

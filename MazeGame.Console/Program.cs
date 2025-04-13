@@ -5,9 +5,13 @@ class Program
 {
     static void Main()
     {
-        Game game = new Game(Console.Write);
+        Console.WriteLine("Welcome to the Maze Game!");
+        Console.WriteLine("For basic controls use arrow keys or WASD. Press ESC to exit.");
+        Console.WriteLine("Press any key to start...");
+        Console.ReadKey(true);
+        Console.Clear();
 
-        Console.WriteLine("Use arrows or WASD. Press ESC to exit.");
+        Game game = new Game(Console.Write);
 
         ConsoleKey key = ConsoleKey.Enter;
 

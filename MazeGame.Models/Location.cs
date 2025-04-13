@@ -1,4 +1,5 @@
 ﻿using System.Data.Common;
+using System.Drawing;
 
 namespace MazeGame.Models
 {
@@ -36,6 +37,21 @@ namespace MazeGame.Models
         {
             Row = row;
             Column = column;
+        }
+
+        public override bool Equals(object? other)
+        {
+            if (other == null || GetType() != other.GetType())
+                return false;
+
+            Location otherPoint = (Location)other;
+
+            return _row == otherPoint.Row &&
+                   Column == otherPoint.Column;
+        }
+        public override int GetHashCode()
+        {
+            return HashCode.Combine(_row, _column);
         }
     }
 }

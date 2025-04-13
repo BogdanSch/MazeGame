@@ -1,7 +1,6 @@
 ﻿using MazeGame.Models;
 using MazeGame.Models.Enums;
 using MazeGame.Models.Units;
-using System.Drawing;
 
 namespace MazeGame
 {
@@ -14,8 +13,11 @@ namespace MazeGame
         private Cell _playerCell;
         private readonly Cell _exitCell;
 
-        public bool IsGameOver =>
-            _exitCell.OccupyingUnit is Player;
+        public bool IsGameOver 
+        {
+            get => _playerCell.Location.Equals(_exitCell.Location) || _playerCell.OccupyingUnit is Exit;
+        }
+        
 
         public Game(int rows, int cols, Action<string> print)
         {
@@ -25,14 +27,15 @@ namespace MazeGame
             _print = print;
 
             _player = new Player("Player");
-            _playerCell = _maze[0, 0];
+            _playerCell = _maze[1, 1];
             _playerCell.OccupyingUnit = _player;
 
             Exit exit = new();
-            _exitCell = _maze[rows - 1, cols - 1];
+            _exitCell = _maze[rows - 2, cols - 1];
             _exitCell.OccupyingUnit = exit;
 
             _maze.PrintMaze(print);
+            PrintPlayerInventory();
         }
 
         public Game(Action<string> print)
@@ -62,12 +65,40 @@ namespace MazeGame
 
             if (_maze.CanMove(current))
             {
+                Cell nextCell = _maze[current.Row, current.Column];
+                CheckReachedCell(nextCell);
+
                 _maze[_playerCell.Location.Row, _playerCell.Location.Column].OccupyingUnit = null;
                 _playerCell = _maze[current.Row, current.Column];
                 _playerCell.OccupyingUnit = _player;
+
+                
                 //_maze.PrintMaze(_print);
             }
             _maze.PrintMaze(_print);
+            PrintPlayerInventory();
+        }
+
+        private void CheckReachedCell(Cell reachedCell)
+        {
+            if(reachedCell.OccupyingUnit is Key)
+
+        }
+
+        public void PrintPlayerInventory()
+        {
+            _print("\nCollected Keys: ");
+
+            if (_player.CollectedKeys.Count == 0)
+            {
+                _print("None");
+                return;
+            }
+
+            foreach (Key key in _player.CollectedKeys)
+            {
+                _print($"Key: {key.Name} ");
+            }
         }
         public void PrintVictoryMessage()
         {

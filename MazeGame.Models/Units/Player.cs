@@ -25,5 +25,9 @@ namespace MazeGame.Models.Units
         {
             return CollectedKeys.Contains(key);
         }
+        public void RemoveKey(Key key)
+        {
+            CollectedKeys.Remove(key);
+        }
     }
 }

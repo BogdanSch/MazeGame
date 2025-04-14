@@ -8,10 +8,12 @@ class Program
         Console.WriteLine("Welcome to the Maze Game!");
         Console.WriteLine("For basic controls use arrow keys or WASD. Press ESC to exit.");
         Console.WriteLine("Press any key to start...");
+
         Console.ReadKey(true);
         Console.Clear();
 
         Game game = new Game(Console.Write);
+        game.StartGame();
 
         ConsoleKey key = ConsoleKey.Enter;
 

@@ -174,18 +174,20 @@ namespace MazeGame.Models
                 int doorIndex = i * spacing;
                 if (doorIndex >= _pathToExit.Count) break;
 
+                Door newDoor = new(char.ToUpper(letter));
                 Cell doorCell = _pathToExit[doorIndex];
-                doorCell.OccupyingUnit = new Door(Char.ToUpper(letter));
+                doorCell.OccupyingUnit = newDoor;
                 _doors.Add(doorCell);
 
-                // Find a key placement before the door
                 int keySearchStart = Math.Max(0, doorIndex - spacing / 2);
                 for (int j = keySearchStart; j < doorIndex; j++)
                 {
                     Cell potentialKeyCell = _pathToExit[j];
                     if (potentialKeyCell.OccupyingUnit == null)
                     {
-                        potentialKeyCell.OccupyingUnit = new Key(letter);
+                        Key newKey = new(letter);
+                        potentialKeyCell.OccupyingUnit = newKey;
+                        newDoor.DoorKey = newKey;
                         break;
                     }
                 }

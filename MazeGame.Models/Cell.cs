@@ -17,7 +17,11 @@ namespace MazeGame.Models
 
         public bool IsWalkable()
         {
-            return OccupyingUnit == null || OccupyingUnit is not Wall;
+            if(OccupyingUnit is Door door)
+            {
+                return door.IsOpen;
+            }
+            return OccupyingUnit == null || OccupyingUnit is Key || OccupyingUnit is Exit;
         }
 
         public override string ToString()

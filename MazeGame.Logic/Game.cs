@@ -150,7 +150,7 @@ namespace MazeGame
 
             foreach (Key key in _player.CollectedKeys)
             {
-                _print($"Key: {key.Symbol} ");
+                _print($"{key.Symbol} ");
             }
         }
     }

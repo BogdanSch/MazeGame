@@ -12,11 +12,11 @@ namespace MazeGame.Models
         private readonly Stack<Cell> _stack = new();
         private readonly List<Cell> _pathToExit = new();
         private readonly List<Cell> _doors = new();
+
         public Cell[,] Field { get; set; }
         public int Rows { get; private set; }
         public int Columns { get; private set; }
-        public int KeysCount { get => 3; }//{ get => (Rows + Columns) / 8; }
-        public int DoorsCount { get => 3; }//{ get => (Rows + Columns) / 8; }
+        public int DoorsCount { get => (int)Math.Floor(Rows / 5.0); }
 
         public Maze(int rows, int columns)
         {
@@ -25,27 +25,24 @@ namespace MazeGame.Models
             Field = new Cell[Rows, Columns];
             Initialize();
         }
-
         public Maze() : this(DEFAULT_ROWS_COUNT, DEFAULT_COLS_COUNT) { }
-
         public Cell this[int row, int col]
         {
             get
             {
-                if (CheckBoundaries(row, col))
+                if (CheckProperBoundaries(row, col))
                     throw new IndexOutOfRangeException("Invalid cell coordinates");
                 return Field[row, col];
             }
             set
             {
-                if (CheckBoundaries(row, col))
+                if (CheckProperBoundaries(row, col))
                     throw new IndexOutOfRangeException("Invalid cell coordinates");
                 Field[row, col] = value;
             }
         }
 
-        private bool CheckBoundaries(int row, int col) => row < 0 || row >= Rows || col < 0 || col >= Columns;
-
+        private bool CheckProperBoundaries(int row, int col) => row < 0 || row >= Rows || col < 0 || col >= Columns;
         private void Initialize()
         {
             for (int row = 0; row < Rows; row++)
@@ -55,7 +52,7 @@ namespace MazeGame.Models
 
         public bool CanMove(Location location)
         {
-            if (CheckBoundaries(location.Row, location.Column))
+            if (CheckProperBoundaries(location.Row, location.Column))
                 return false;
             Cell cell = Field[location.Row, location.Column];
             return cell.IsWalkable();
@@ -83,7 +80,6 @@ namespace MazeGame.Models
         public void GenerateMaze(int startRow = 1, int startColumn = 1)
         {
             Field[startRow, startColumn].OccupyingUnit = null;
-            //Field[Rows - 1, Columns - 1].OccupyingUnit = null;
 
             Cell startCell = Field[startRow, startColumn];
             startCell.IsVisited = true;
@@ -125,18 +121,36 @@ namespace MazeGame.Models
                 }
             }
         }
-        protected bool FindPathToExit(Location from, Location to)
+        public bool IsDeadEnd(Cell cell)
         {
-            if(CheckBoundaries(from.Row, from.Column) || CheckBoundaries(to.Row, to.Column))
+            int walkableNeighbors = 0;
+            int[][] directions = [new[] { -1, 0 }, new[] { 1, 0 }, new[] { 0, -1 }, new[] { 0, 1 }];
+
+            foreach (int[] dir in directions)
+            {
+                int newRow = cell.Location.Row + dir[0];
+                int newCol = cell.Location.Column + dir[1];
+
+                if(CheckProperBoundaries(newRow, newCol)) continue;
+
+                Cell neighbor = Field[newRow, newCol];
+                if (neighbor.IsWalkable()) walkableNeighbors++;
+            }
+
+            return walkableNeighbors == 1;
+        }
+        protected bool FindPath(Location from, Location to, List<Cell> path)
+        {
+            if (CheckProperBoundaries(from.Row, from.Column) || CheckProperBoundaries(to.Row, to.Column))
                 return false;
-            if(Field[from.Row, from.Column].OccupyingUnit is Wall)
+            if (Field[from.Row, from.Column].OccupyingUnit is Wall)
                 return false;
-            if(Field[from.Row, from.Column].IsVisited)
+            if (Field[from.Row, from.Column].IsVisited)
                 return false;
 
             Cell currentCell = Field[from.Row, from.Column];
             currentCell.IsVisited = true;
-            _pathToExit.Add(currentCell);
+            path.Add(currentCell);
 
             if (from.Equals(to)) return true;
 
@@ -145,22 +159,54 @@ namespace MazeGame.Models
             {
                 int nextRow = from.Row + direction[0];
                 int nextCol = from.Column + direction[1];
-                Location nextLocation = new Location(nextRow, nextCol);
+                Location nextLocation = new(nextRow, nextCol);
 
-                if(FindPathToExit(nextLocation, to))
-                {
+                if (FindPath(nextLocation, to, path))
                     return true;
-                }
             }
 
-            _pathToExit.Remove(currentCell);
+            path.Remove(currentCell);
             return false;
         }
         public List<Cell> FindPathToExit()
         {
-            FindPathToExit(new Location(1, 1), new Location(Rows - 2, Columns - 2));
+            _pathToExit.Clear();
+            FindPath(new Location(1, 1), new Location(Rows - 2, Columns - 2), _pathToExit);
             return _pathToExit;
         }
+        public List<Cell> FindReachableDeadEnds(Cell doorCell)
+        {
+            Location start = new(1, 1);
+            List<Cell> reachableDeadEnds = [];
+
+            for (int row = 1; row < doorCell.Location.Row; row++)
+            {
+                for (int col = 1; col < doorCell.Location.Column; col++)
+                {
+                    Cell cell = Field[row, col];
+                    if (cell.OccupyingUnit != null) continue;
+                    if (!IsDeadEnd(cell)) continue;
+                    if (row == 1 && col == 1) continue;
+
+                    Location end = cell.Location;
+
+                    List<Cell> pathToDeadEnd = [];
+
+                    SetAllCellsUnvisited();
+
+                    if (FindPath(start, end, pathToDeadEnd))
+                    {
+                        if (!pathToDeadEnd.Contains(doorCell))
+                        {
+                            reachableDeadEnds.Add(cell);
+                        }
+                    }
+                }
+            }
+
+            return reachableDeadEnds;
+        }
+
         public void PlaceDoorsAndKeys()
         {
             FindPathToExit();
@@ -173,23 +219,42 @@ namespace MazeGame.Models
             {
                 int doorIndex = i * spacing;
                 if (doorIndex >= _pathToExit.Count) break;
+                else if (_pathToExit[doorIndex].Location.Row == 1 && _pathToExit[doorIndex].Location.Column == 1) continue;
 
                 Door newDoor = new(char.ToUpper(letter));
                 Cell doorCell = _pathToExit[doorIndex];
                 doorCell.OccupyingUnit = newDoor;
                 _doors.Add(doorCell);
 
-                int keySearchStart = Math.Max(0, doorIndex - spacing / 2);
-                for (int j = keySearchStart; j < doorIndex; j++)
+                List<Cell> keyLocations = FindReachableDeadEnds(doorCell);
+
+                if (keyLocations.Count == 0)
                 {
-                    Cell potentialKeyCell = _pathToExit[j];
-                    if (potentialKeyCell.OccupyingUnit == null)
+                    int keySearchStart = Math.Max(0, doorIndex - spacing / 2);
+
+                    for (int j = keySearchStart; j < doorIndex; j++)
                     {
+                        Cell potentialKeyCell = _pathToExit[j];
+
+                        if (potentialKeyCell.OccupyingUnit == null)
+                        {
+                            Key newKey = new(letter);
+                            potentialKeyCell.OccupyingUnit = newKey;
+                            newDoor.DoorKey = newKey;
+                            break;
+                        }
+                    }
+                }
+                else
+                {
+                    Cell potentialKeyCell = keyLocations[_random.Next(keyLocations.Count)];
+
+                    //if (potentialKeyCell.OccupyingUnit == null)
+                    //{
                         Key newKey = new(letter);
                         potentialKeyCell.OccupyingUnit = newKey;
                         newDoor.DoorKey = newKey;
-                        break;
-                    }
+                    //}
                 }
             }
         }

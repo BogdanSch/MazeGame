@@ -20,6 +20,8 @@ namespace MazeGame
         private int _gameDuration;
         private int _currentTime;
 
+        public string GameState { get; private set; } = string.Empty;
+
         public bool IsGameOver
         {
             get => _playerCell.Location.Equals(_exitCell.Location) || _playerCell.OccupyingUnit is Exit || _currentTime <= 0;
@@ -46,7 +48,8 @@ namespace MazeGame
             _maze.PrintMaze(print);
             PrintPlayerInventory();
         }
-
+        public Game(Action<string> print, int gameDuration)
+            : this(Maze.DEFAULT_ROWS_COUNT, Maze.DEFAULT_COLS_COUNT, print, gameDuration) { }
         public Game(Action<string> print)
             : this(Maze.DEFAULT_ROWS_COUNT, Maze.DEFAULT_COLS_COUNT, print, DEFAULT_GAME_DURATION) { }
 
@@ -59,21 +62,21 @@ namespace MazeGame
             if (IsGameOver)
             {
                 _timer?.Dispose();
-                //PrintVictoryMessage();
+                GameState = "Congratulations! You have reached the exit!";
                 return;
             }
             if (_currentTime <= 0)
             {
                 _timer?.Dispose();
-                _print("\nTime is up! Game over.");
-                //IsGameOver = true;
+                GameState = "Time is up! Game over.";
                 return;
             }
             _currentTime--;
         }
         public void MovePlayer(Direction direction)
         {
-            if (IsGameOver) return;
+            if (IsGameOver) 
+                return;
 
             Location current = _playerCell.Location;
 
@@ -114,9 +117,10 @@ namespace MazeGame
 
             if (followingUnit == null) return;
 
-            if (reachedCell.OccupyingUnit is Key)
+            if (reachedCell.OccupyingUnit is Key key)
             {
-                _player.AddKey((Key)followingUnit);
+                _player.AddKey(key);
+                GameState = $"Found the key {key.Symbol} to open this door.";
             }
             else if (reachedCell.OccupyingUnit is Door door)
             {
@@ -125,23 +129,22 @@ namespace MazeGame
                 if (_player.HasKey(door.DoorKey))
                 {
                     door.IsOpen = true;
-                    _print($"\nYou opened the door with key {door.DoorKey.Name}.");
+                    GameState = $"You opened the door with key {door.DoorKey.Symbol}.";
                     _player.RemoveKey(door.DoorKey);
                 }
                 else
                 {
-                    _print($"\nYou need key {door.DoorKey?.Name} to open this door.");
+                    GameState = $"You need key {door.DoorKey?.Symbol} to open this door.";
                 }
             }
         }
-
         public void PrintPlayerInventory()
         {
             _print("\nCollected Keys: ");
 
             if (_player.CollectedKeys.Count == 0)
             {
-                _print("None");
+                _print("_");
                 return;
             }
 
@@ -149,10 +152,6 @@ namespace MazeGame
             {
                 _print($"Key: {key.Symbol} ");
             }
-        }
-        public void PrintVictoryMessage()
-        {
-            _print("\nCongratulations! You have reached the exit!");
         }
     }
 }

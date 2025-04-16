@@ -12,17 +12,15 @@ class Program
         Console.ResetColor();
     }
 
-    private static void PrintGameAction(string message, MessageStyle? style)
+    private static void DisplayGameAction(string message, MessageStyle? style)
     {
         ConsoleColor color = ConsoleColor.Gray;
 
-        if(style == null) color = ConsoleColor.Gray;
-        else if (Enum.TryParse<ConsoleColor>(style.ColorName, ignoreCase: true, out var parsedColor))
+        if (style != null && Enum.TryParse<ConsoleColor>(style.ColorName, ignoreCase: true, out var parsedColor))
             color = parsedColor;
 
         Console.ForegroundColor = color;
         Console.Write(message);
-        Console.ResetColor();
     }
 
     static void Main()
@@ -31,7 +29,7 @@ class Program
 
         (int gameDurationSeconds, int rowsCount, int colsCount) = ConfigureGame();
 
-        Game game = new(rowsCount, colsCount, PrintGameAction, gameDurationSeconds);
+        Game game = new(rowsCount, colsCount, DisplayGameAction, gameDurationSeconds);
         game.StartGame();
 
         ConsoleKey key = ConsoleKey.Enter;

@@ -1,6 +1,4 @@
 ﻿using MazeGame.Models.Units;
-using System.IO;
-using System.Numerics;
 
 namespace MazeGame.Models
 {
@@ -13,7 +11,8 @@ namespace MazeGame.Models
         private readonly List<Cell> _pathToExit = new();
         private readonly List<Cell> _doors = new();
 
-        private static readonly int[][] directions = [new[] { -1, 0 }, new[] { 1, 0 }, new[] { 0, -1 }, new[] { 0, 1 }];
+        private static readonly int[][] _directions = [new[] { -1, 0 }, new[] { 1, 0 }, new[] { 0, -1 }, new[] { 0, 1 }];
+        private static string[] _colors = { "Red", "Green", "Blue", "Magenta", "Cyan", "DarkGreen" };
 
         public Cell[,] Field { get; set; }
         public int Rows { get; private set; }
@@ -83,7 +82,6 @@ namespace MazeGame.Models
         {
             if (IsOutOfBounds(startRow, startColumn))
                 throw new ArgumentOutOfRangeException("Invalid starting cell coordinates");
-            //Field[startRow, startColumn].OccupyingUnit = null;
 
             Cell startCell = Field[startRow, startColumn];
             startCell.OccupyingUnit = null;
@@ -126,23 +124,6 @@ namespace MazeGame.Models
                 }
             }
         }
-        public bool IsDeadEnd(Cell cell)
-        {
-            int walkableNeighbors = 0;
-
-            foreach (int[] dir in directions)
-            {
-                int newRow = cell.Location.Row + dir[0];
-                int newCol = cell.Location.Column + dir[1];
-
-                if(IsOutOfBounds(newRow, newCol)) continue;
-
-                Cell neighbor = Field[newRow, newCol];
-                if (neighbor.IsWalkable()) walkableNeighbors++;
-            }
-
-            return walkableNeighbors == 1;
-        }
         protected bool FindPath(Location from, Location to, List<Cell> path)
         {
             if (IsOutOfBounds(from.Row, from.Column) || IsOutOfBounds(to.Row, to.Column))
@@ -158,7 +139,7 @@ namespace MazeGame.Models
 
             if (from.Equals(to)) return true;
 
-            foreach (int[] direction in directions)
+            foreach (int[] direction in _directions)
             {
                 int nextRow = from.Row + direction[0];
                 int nextCol = from.Column + direction[1];
@@ -176,6 +157,23 @@ namespace MazeGame.Models
             _pathToExit.Clear();
             FindPath(new Location(1, 1), new Location(Rows - 2, Columns - 2), _pathToExit);
             return _pathToExit;
+        }
+        public bool IsDeadEnd(Cell cell)
+        {
+            int walkableNeighbors = 0;
+
+            foreach (int[] dir in _directions)
+            {
+                int newRow = cell.Location.Row + dir[0];
+                int newCol = cell.Location.Column + dir[1];
+
+                if (IsOutOfBounds(newRow, newCol)) continue;
+
+                Cell neighbor = Field[newRow, newCol];
+                if (neighbor.IsWalkable()) walkableNeighbors++;
+            }
+
+            return walkableNeighbors == 1;
         }
         public List<Cell> FindReachableDeadEnds(Cell doorCell)
         {
@@ -223,12 +221,20 @@ namespace MazeGame.Models
                 if (doorIndex >= _pathToExit.Count) break;
                 else if (_pathToExit[doorIndex].Location.Row == 1 && _pathToExit[doorIndex].Location.Column == 1) continue;
 
+
+                string pairColor = _colors[i % _colors.Length];
+
                 Door newDoor = new(char.ToUpper(letter));
+                newDoor.MessageStyle.ColorName = pairColor;
+
                 Cell doorCell = _pathToExit[doorIndex];
                 doorCell.OccupyingUnit = newDoor;
                 _doors.Add(doorCell);
 
                 List<Cell> keyLocations = FindReachableDeadEnds(doorCell);
+
+                Key newKey = new(letter);
+                newKey.MessageStyle.ColorName = pairColor;
 
                 if (keyLocations.Count == 0)
                 {
@@ -240,7 +246,7 @@ namespace MazeGame.Models
 
                         if (potentialKeyCell.OccupyingUnit == null)
                         {
-                            Key newKey = new(letter);
+                            //Key newKey = new(letter);
                             potentialKeyCell.OccupyingUnit = newKey;
                             newDoor.DoorKey = newKey;
                             break;
@@ -251,13 +257,12 @@ namespace MazeGame.Models
                 {
                     Cell potentialKeyCell = keyLocations[_random.Next(keyLocations.Count)];
 
-                    Key newKey = new(letter);
+                    //Key newKey = new(letter);
                     potentialKeyCell.OccupyingUnit = newKey;
                     newDoor.DoorKey = newKey;
                 }
             }
         }
-
         public void PrintMaze(Action<string, MessageStyle?> printAction)
         {
             for (int row = 0; row < Rows; row++)
@@ -265,15 +270,7 @@ namespace MazeGame.Models
                 for (int col = 0; col < Columns; col++)
                 {
                     Cell current = Field[row, col];
-
-                    if (current.OccupyingUnit != null && current.OccupyingUnit is Player player)
-                    {
-                        printAction(current.ToString(), player.MessageStyle);
-                    }
-                    else
-                    {
-                        printAction(current.ToString(), null);
-                    }
+                    printAction(current.ToString(), current.OccupyingUnit?.MessageStyle);
                 }
                 printAction("\n", null);
             }

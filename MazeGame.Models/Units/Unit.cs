@@ -9,7 +9,6 @@ namespace MazeGame.Models.Units
     public abstract class Unit
     {
         public virtual string Name { get; set; } = String.Empty;
-        public virtual ConsoleColor Color { get; set; } = ConsoleColor.White;
         public char Symbol { get; set; }
         public override string ToString()
         {

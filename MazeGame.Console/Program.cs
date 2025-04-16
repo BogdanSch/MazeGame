@@ -4,13 +4,34 @@ using MazeGame.Models.Enums;
 
 class Program
 {
+    private static void DisplayGameState(string gameState)
+    {
+        Console.WriteLine();
+        Console.ForegroundColor = ConsoleColor.Cyan;
+        Console.WriteLine(gameState);
+        Console.ResetColor();
+    }
+
+    private static void PrintGameAction(string message, MessageStyle? style)
+    {
+        ConsoleColor color = ConsoleColor.Gray;
+
+        if(style == null) color = ConsoleColor.Gray;
+        else if (Enum.TryParse<ConsoleColor>(style.ColorName, ignoreCase: true, out var parsedColor))
+            color = parsedColor;
+
+        Console.ForegroundColor = color;
+        Console.Write(message);
+        Console.ResetColor();
+    }
+
     static void Main()
     {
         DisplayWelcomeMessage();
 
         (int gameDurationSeconds, int rowsCount, int colsCount) = ConfigureGame();
 
-        Game game = new(rowsCount, colsCount, Console.Write, gameDurationSeconds);
+        Game game = new(rowsCount, colsCount, PrintGameAction, gameDurationSeconds);
         game.StartGame();
 
         ConsoleKey key = ConsoleKey.Enter;
@@ -23,13 +44,13 @@ class Program
             {
                 Console.Clear();
                 game.MovePlayer(direction);
-                Console.WriteLine();
-                Console.WriteLine(game.GameState);
+                DisplayGameState(game.GameState);
             }
         }
 
         Console.Clear();
-        Console.WriteLine(game.GameState);
+        game.CheckGameOver();
+        DisplayGameState(game.GameState);
 
         if (key != ConsoleKey.Escape)
         {
@@ -50,9 +71,9 @@ class Program
     private static (int gameDurationSeconds, int rowsCount, int colsCount) ConfigureGame()
     {
         Console.WriteLine("Select difficulty:");
-        Console.WriteLine("1. Easy    ->  Duration: 100s | Maze: 11x11");
-        Console.WriteLine("2. Medium  ->  Duration: 60s  | Maze: 15x15");
-        Console.WriteLine("3. Hard    ->  Duration: 30s  | Maze: 21x21");
+        Console.WriteLine("1. Easy    ->  Duration: 90s | Maze: 11x11");
+        Console.WriteLine("2. Medium  ->  Duration: 70s  | Maze: 15x15");
+        Console.WriteLine("3. Hard    ->  Duration: 60s  | Maze: 19x27");
         Console.WriteLine("4. Custom  ->  Choose your own settings");
 
         ConsoleKey key = Console.ReadKey(true).Key;
@@ -64,20 +85,21 @@ class Program
         {
             case ConsoleKey.D1:
             case ConsoleKey.NumPad1:
-                gameDurationSeconds = 100;
+                gameDurationSeconds = 90;
                 rowsCount = colsCount = 11;
                 break;
 
             case ConsoleKey.D2:
             case ConsoleKey.NumPad2:
-                gameDurationSeconds = 60;
+                gameDurationSeconds = 70;
                 rowsCount = colsCount = 15;
                 break;
 
             case ConsoleKey.D3:
             case ConsoleKey.NumPad3:
-                gameDurationSeconds = 40;
-                rowsCount = colsCount = 21;
+                gameDurationSeconds = 60;
+                rowsCount = 19;
+                colsCount = 27;
                 break;
 
             case ConsoleKey.D4:
@@ -100,7 +122,7 @@ class Program
         Console.Clear();
         Console.Write("Enter game duration in seconds (default 60): ");
         string? gameDurationInput = Console.ReadLine();
-        Console.Write("Enter maze dimensions in format NxM (odd numbers): ");
+        Console.Write("Enter maze dimensions in format NxM (They shoudl be odd numbers, N > 4 and M > 4): ");
         string? dimensionsLine = Console.ReadLine()?.Trim().ToLower();
 
         bool isValidDuration = int.TryParse(gameDurationInput, out int gameDurationSeconds);
@@ -114,7 +136,8 @@ class Program
             string[] dimensions = dimensionsLine.Split('x', StringSplitOptions.RemoveEmptyEntries);
             if (dimensions.Length == 2 &&
                 int.TryParse(dimensions[0], out rowsCount) &&
-                int.TryParse(dimensions[1], out colsCount))
+                int.TryParse(dimensions[1], out colsCount) &&
+                rowsCount > 4 && colsCount > 4)
             {
                 if (rowsCount % 2 == 0) rowsCount++;
                 if (colsCount % 2 == 0) colsCount++;
@@ -136,16 +159,28 @@ class Program
     }
     private static bool TryConvertKeyToDirection(ConsoleKey key, out Direction direction)
     {
-        direction = Direction.Up;
-
-        return key switch
+        switch (key)
         {
-            ConsoleKey.W or ConsoleKey.UpArrow => (direction = Direction.Up) == Direction.Up,
-            ConsoleKey.S or ConsoleKey.DownArrow => (direction = Direction.Down) == Direction.Down,
-            ConsoleKey.A or ConsoleKey.LeftArrow => (direction = Direction.Left) == Direction.Left,
-            ConsoleKey.D or ConsoleKey.RightArrow => (direction = Direction.Right) == Direction.Right,
-            _ => false
-        };
+            case ConsoleKey.W:
+            case ConsoleKey.UpArrow:
+                direction = Direction.Up;
+                return true;
+            case ConsoleKey.S:
+            case ConsoleKey.DownArrow:
+                direction = Direction.Down;
+                return true;
+            case ConsoleKey.A:
+            case ConsoleKey.LeftArrow:
+                direction = Direction.Left;
+                return true;
+            case ConsoleKey.D:
+            case ConsoleKey.RightArrow:
+                direction = Direction.Right;
+                return true;
+            default:
+                direction = Direction.Up;
+                return false;
+        }
     }
     private static void DisplayWelcomeMessage()
     {

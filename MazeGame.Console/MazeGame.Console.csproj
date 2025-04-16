@@ -8,6 +8,10 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="Figgle" Version="0.5.1" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\MazeGame.Logic\MazeGame.Logic.csproj" />
     <ProjectReference Include="..\MazeGame.Models\MazeGame.Models.csproj" />
   </ItemGroup>

@@ -10,12 +10,16 @@ namespace MazeGame.Models.Units
     {
         public List<Key> CollectedKeys { get; set; } = [];
         public override string Name { get; set; }
-        public override ConsoleColor Color { get; set; }
+        public MessageStyle MessageStyle { get; set; }
         public Player(string name)
         {
             Name = name;
             Symbol = 'o';
-            Color = ConsoleColor.Yellow;
+            MessageStyle = new()
+            {
+                ColorName = "Yellow",
+                IsBold = false
+            };
         }
         public void AddKey(Key key)
         {

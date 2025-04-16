@@ -7,7 +7,7 @@ namespace MazeGame
 {
     public class Game
     {
-        private readonly Action<string> _print;
+        private readonly Action<string, MessageStyle?> _print;
 
         private readonly Maze _maze;
         private readonly Player _player;
@@ -24,10 +24,10 @@ namespace MazeGame
 
         public bool IsGameOver
         {
-            get => _playerCell.Location.Equals(_exitCell.Location) || _playerCell.OccupyingUnit is Exit || _currentTime <= 0;
+            get => _playerCell.Location.Equals(_exitCell.Location) || _exitCell.OccupyingUnit is Player || _currentTime <= 0;
         }
 
-        public Game(int rows, int cols, Action<string> print, int gameDuration)
+        public Game(int rows, int cols, Action<string, MessageStyle?> print, int gameDuration)
         {
             _maze = new Maze(rows, cols);
             _maze.GenerateMaze();
@@ -48,30 +48,36 @@ namespace MazeGame
             _maze.PrintMaze(print);
             PrintPlayerInventory();
         }
-        public Game(Action<string> print, int gameDuration)
+        public Game(Action<string, MessageStyle?> print, int gameDuration)
             : this(Maze.DEFAULT_ROWS_COUNT, Maze.DEFAULT_COLS_COUNT, print, gameDuration) { }
-        public Game(Action<string> print)
+        public Game(Action<string, MessageStyle?> print)
             : this(Maze.DEFAULT_ROWS_COUNT, Maze.DEFAULT_COLS_COUNT, print, DEFAULT_GAME_DURATION) { }
 
         public void StartGame()
         {
+            _currentTime = _gameDuration;
             _timer = new Timer(TimerCallback, null, 0, TIMER_STEP);
         }
         private void TimerCallback(object? state)
         {
             if (IsGameOver)
             {
+                CheckGameOver();
                 _timer?.Dispose();
-                GameState = "Congratulations! You have reached the exit!";
-                return;
-            }
-            if (_currentTime <= 0)
-            {
-                _timer?.Dispose();
-                GameState = "Time is up! Game over.";
                 return;
             }
             _currentTime--;
+        }
+        public void CheckGameOver()
+        {
+            if(_currentTime <= 0)
+            {
+                GameState = "Time is up! Game over.";
+            }
+            else if (_exitCell.OccupyingUnit is Player)
+            {
+                GameState = "Congratulations! You have reached the exit!";
+            }
         }
         public void MovePlayer(Direction direction)
         {
@@ -108,7 +114,7 @@ namespace MazeGame
 
             _maze.PrintMaze(_print);
             PrintPlayerInventory();
-            _print($"\nTime left: {_currentTime}");
+            _print($"\nTime left: {_currentTime}", null);
         }
 
         private void CheckNextCell(Cell reachedCell)
@@ -140,17 +146,17 @@ namespace MazeGame
         }
         public void PrintPlayerInventory()
         {
-            _print("\nCollected Keys: ");
+            _print("\nCollected Keys: ", null);
 
             if (_player.CollectedKeys.Count == 0)
             {
-                _print("_");
+                _print("_", null);
                 return;
             }
 
             foreach (Key key in _player.CollectedKeys)
             {
-                _print($"{key.Symbol} ");
+                _print($"{key.Symbol} ", null);
             }
         }
     }

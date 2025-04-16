@@ -13,6 +13,8 @@ namespace MazeGame.Models
         private readonly List<Cell> _pathToExit = new();
         private readonly List<Cell> _doors = new();
 
+        private static readonly int[][] directions = [new[] { -1, 0 }, new[] { 1, 0 }, new[] { 0, -1 }, new[] { 0, 1 }];
+
         public Cell[,] Field { get; set; }
         public int Rows { get; private set; }
         public int Columns { get; private set; }
@@ -30,19 +32,19 @@ namespace MazeGame.Models
         {
             get
             {
-                if (CheckProperBoundaries(row, col))
+                if (IsOutOfBounds(row, col))
                     throw new IndexOutOfRangeException("Invalid cell coordinates");
                 return Field[row, col];
             }
             set
             {
-                if (CheckProperBoundaries(row, col))
+                if (IsOutOfBounds(row, col))
                     throw new IndexOutOfRangeException("Invalid cell coordinates");
                 Field[row, col] = value;
             }
         }
 
-        private bool CheckProperBoundaries(int row, int col) => row < 0 || row >= Rows || col < 0 || col >= Columns;
+        private bool IsOutOfBounds(int row, int col) => row < 0 || row >= Rows || col < 0 || col >= Columns;
         private void Initialize()
         {
             for (int row = 0; row < Rows; row++)
@@ -52,7 +54,7 @@ namespace MazeGame.Models
 
         public bool CanMove(Location location)
         {
-            if (CheckProperBoundaries(location.Row, location.Column))
+            if (IsOutOfBounds(location.Row, location.Column))
                 return false;
             Cell cell = Field[location.Row, location.Column];
             return cell.IsWalkable();
@@ -61,14 +63,14 @@ namespace MazeGame.Models
         private List<(Cell neighbor, int dRow, int dCol)> GetUnvisitedNeighboursWithDirection(Cell origin)
         {
             List<(Cell, int, int)> unvisitedNeighbours = [];
-            int[][] directions = [new[] { -2, 0 }, new[] { 2, 0 }, new[] { 0, -2 }, new[] { 0, 2 }];
+            int[][] twoStepDirections = [new[] { -2, 0 }, new[] { 2, 0 }, new[] { 0, -2 }, new[] { 0, 2 }];
 
-            foreach (int[] dir in directions)
+            foreach (int[] dir in twoStepDirections)
             {
                 int newRow = origin.Location.Row + dir[0];
                 int newCol = origin.Location.Column + dir[1];
 
-                if (newRow >= 0 && newRow < Rows && newCol >= 0 && newCol < Columns && !Field[newRow, newCol].IsVisited)
+                if (!IsOutOfBounds(newRow, newCol) && !Field[newRow, newCol].IsVisited)
                 {
                     unvisitedNeighbours.Add((Field[newRow, newCol], dir[0], dir[1]));
                 }
@@ -79,9 +81,12 @@ namespace MazeGame.Models
 
         public void GenerateMaze(int startRow = 1, int startColumn = 1)
         {
-            Field[startRow, startColumn].OccupyingUnit = null;
+            if (IsOutOfBounds(startRow, startColumn))
+                throw new ArgumentOutOfRangeException("Invalid starting cell coordinates");
+            //Field[startRow, startColumn].OccupyingUnit = null;
 
             Cell startCell = Field[startRow, startColumn];
+            startCell.OccupyingUnit = null;
             startCell.IsVisited = true;
             _stack.Push(startCell);
 
@@ -124,14 +129,13 @@ namespace MazeGame.Models
         public bool IsDeadEnd(Cell cell)
         {
             int walkableNeighbors = 0;
-            int[][] directions = [new[] { -1, 0 }, new[] { 1, 0 }, new[] { 0, -1 }, new[] { 0, 1 }];
 
             foreach (int[] dir in directions)
             {
                 int newRow = cell.Location.Row + dir[0];
                 int newCol = cell.Location.Column + dir[1];
 
-                if(CheckProperBoundaries(newRow, newCol)) continue;
+                if(IsOutOfBounds(newRow, newCol)) continue;
 
                 Cell neighbor = Field[newRow, newCol];
                 if (neighbor.IsWalkable()) walkableNeighbors++;
@@ -141,7 +145,7 @@ namespace MazeGame.Models
         }
         protected bool FindPath(Location from, Location to, List<Cell> path)
         {
-            if (CheckProperBoundaries(from.Row, from.Column) || CheckProperBoundaries(to.Row, to.Column))
+            if (IsOutOfBounds(from.Row, from.Column) || IsOutOfBounds(to.Row, to.Column))
                 return false;
             if (Field[from.Row, from.Column].OccupyingUnit is Wall)
                 return false;
@@ -154,7 +158,6 @@ namespace MazeGame.Models
 
             if (from.Equals(to)) return true;
 
-            int[][] directions = [new[] { -1, 0 }, new[] { 1, 0 }, new[] { 0, -1 }, new[] { 0, 1 }];
             foreach (int[] direction in directions)
             {
                 int nextRow = from.Row + direction[0];
@@ -206,7 +209,6 @@ namespace MazeGame.Models
 
             return reachableDeadEnds;
         }
-
         public void PlaceDoorsAndKeys()
         {
             FindPathToExit();
@@ -249,25 +251,31 @@ namespace MazeGame.Models
                 {
                     Cell potentialKeyCell = keyLocations[_random.Next(keyLocations.Count)];
 
-                    //if (potentialKeyCell.OccupyingUnit == null)
-                    //{
-                        Key newKey = new(letter);
-                        potentialKeyCell.OccupyingUnit = newKey;
-                        newDoor.DoorKey = newKey;
-                    //}
+                    Key newKey = new(letter);
+                    potentialKeyCell.OccupyingUnit = newKey;
+                    newDoor.DoorKey = newKey;
                 }
             }
         }
 
-        public void PrintMaze(Action<string> printAction)
+        public void PrintMaze(Action<string, MessageStyle?> printAction)
         {
             for (int row = 0; row < Rows; row++)
             {
                 for (int col = 0; col < Columns; col++)
                 {
-                    printAction(Field[row, col].ToString());
+                    Cell current = Field[row, col];
+
+                    if (current.OccupyingUnit != null && current.OccupyingUnit is Player player)
+                    {
+                        printAction(current.ToString(), player.MessageStyle);
+                    }
+                    else
+                    {
+                        printAction(current.ToString(), null);
+                    }
                 }
-                printAction("\n");
+                printAction("\n", null);
             }
         }
     }

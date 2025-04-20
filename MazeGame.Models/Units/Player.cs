@@ -1,8 +1,11 @@
-﻿namespace MazeGame.Models.Units
+﻿using MazeGame.Models.GameTools;
+
+namespace MazeGame.Models.Units
 {
     public class Player : Unit
     {
         public List<Key> CollectedKeys { get; set; } = [];
+        public List<Tool> CollectedTools { get; set; } = [];
         public override string Name { get; set; }
         public Player(string name)
         {
@@ -21,6 +24,10 @@
         public void RemoveKey(Key key)
         {
             CollectedKeys.Remove(key);
+        }
+        public void AddTool(Tool tool)
+        {
+            CollectedTools.Add(tool);
         }
     }
 }

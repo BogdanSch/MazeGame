@@ -11,7 +11,6 @@ class Program
         Console.WriteLine(gameState);
         Console.ResetColor();
     }
-
     private static void DisplayGameAction(string message, MessageStyle? style)
     {
         ConsoleColor color = ConsoleColor.Gray;
@@ -42,6 +41,12 @@ class Program
             {
                 Console.Clear();
                 game.MovePlayer(direction);
+                DisplayGameState(game.GameState);
+            }
+            else if(key == ConsoleKey.X)
+            {
+                Console.Clear();
+                game.UseTool();
                 DisplayGameState(game.GameState);
             }
         }
@@ -83,21 +88,17 @@ class Program
         {
             case ConsoleKey.D1:
             case ConsoleKey.NumPad1:
-                gameDurationSeconds = 90;
-                rowsCount = colsCount = 11;
+                (gameDurationSeconds, rowsCount, colsCount) = Game.DifficultyLevels["Easy"];
                 break;
 
             case ConsoleKey.D2:
             case ConsoleKey.NumPad2:
-                gameDurationSeconds = 70;
-                rowsCount = colsCount = 15;
+                (gameDurationSeconds, rowsCount, colsCount) = Game.DifficultyLevels["Medium"];
                 break;
 
             case ConsoleKey.D3:
             case ConsoleKey.NumPad3:
-                gameDurationSeconds = 60;
-                rowsCount = 19;
-                colsCount = 27;
+                (gameDurationSeconds, rowsCount, colsCount) = Game.DifficultyLevels["Hard"];
                 break;
 
             case ConsoleKey.D4:
@@ -201,6 +202,7 @@ class Program
         Console.WriteLine();
         Console.WriteLine("Navigate through the maze. Collect treasures. Avoid traps.");
         Console.WriteLine("Controls: Arrow Keys  or  W A S D");
+        Console.WriteLine("To use a tool: X");
         Console.WriteLine("Exit: [ESC] | Confirm: [Enter]");
         Console.WriteLine("Press any key to start your adventure...");
         Console.ReadKey(true);

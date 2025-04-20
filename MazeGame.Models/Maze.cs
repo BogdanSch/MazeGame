@@ -1,4 +1,5 @@
-﻿using MazeGame.Models.Units;
+﻿using MazeGame.Models.GameTools;
+using MazeGame.Models.Units;
 
 namespace MazeGame.Models
 {
@@ -12,7 +13,7 @@ namespace MazeGame.Models
         private readonly List<Cell> _doors = new();
 
         private static readonly int[][] _directions = [new[] { -1, 0 }, new[] { 1, 0 }, new[] { 0, -1 }, new[] { 0, 1 }];
-        private static string[] _colors = { "Red", "Green", "Blue", "Magenta", "Cyan", "DarkGreen" };
+        private static readonly string[] _colors = ["Red", "Green", "Blue", "Magenta", "Cyan", "DarkGreen", "DarkCyan"];
 
         public Cell[,] Field { get; set; }
         public int Rows { get; private set; }
@@ -50,7 +51,6 @@ namespace MazeGame.Models
                 for (int col = 0; col < Columns; col++)
                     Field[row, col] = new Cell(row, col, new Wall());
         }
-
         public bool CanMove(Location location)
         {
             if (IsOutOfBounds(location.Row, location.Column))
@@ -58,7 +58,6 @@ namespace MazeGame.Models
             Cell cell = Field[location.Row, location.Column];
             return cell.IsWalkable();
         }
-
         private List<(Cell neighbor, int dRow, int dCol)> GetUnvisitedNeighboursWithDirection(Cell origin)
         {
             List<(Cell, int, int)> unvisitedNeighbours = [];
@@ -77,7 +76,6 @@ namespace MazeGame.Models
 
             return unvisitedNeighbours;
         }
-
         public void GenerateMaze(int startRow = 1, int startColumn = 1)
         {
             if (IsOutOfBounds(startRow, startColumn))
@@ -113,6 +111,7 @@ namespace MazeGame.Models
 
             SetAllCellsUnvisited();
             PlaceDoorsAndKeys();
+            PlaceTools();
         }
         private void SetAllCellsUnvisited()
         {
@@ -246,7 +245,6 @@ namespace MazeGame.Models
 
                         if (potentialKeyCell.OccupyingUnit == null)
                         {
-                            //Key newKey = new(letter);
                             potentialKeyCell.OccupyingUnit = newKey;
                             newDoor.DoorKey = newKey;
                             break;
@@ -256,10 +254,24 @@ namespace MazeGame.Models
                 else
                 {
                     Cell potentialKeyCell = keyLocations[_random.Next(keyLocations.Count)];
-
-                    //Key newKey = new(letter);
                     potentialKeyCell.OccupyingUnit = newKey;
                     newDoor.DoorKey = newKey;
+                }
+            }
+        }
+        public void PlaceTools()
+        {
+            for (int row = 1; row < Rows - 1; row++)
+            {
+                for (int col = 1; col < Columns - 1; col++)
+                {
+                    Cell cell = Field[row, col];
+                    if (cell.OccupyingUnit == null && _random.NextDouble() < 0.05)
+                    {
+                        Tool tool = new Explosive(4, 5);
+                        cell.OccupyingUnit = tool;
+                        return;
+                    }
                 }
             }
         }

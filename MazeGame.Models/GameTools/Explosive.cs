@@ -13,6 +13,7 @@
         }
         public override void Use()
         {
+            IsActivated = true;
             timer = new Timer(Explode, null, 0, TIMER_STEP);
         }
         private void Explode(object? state)
@@ -21,8 +22,9 @@
             {
                 timer?.Dispose();
                 Exploded?.Invoke(this, EventArgs.Empty);
+                Exploded = null;
                 Durability = 0;
-                IsUsed = true;
+                //IsUsed = true;
                 return;
             }
             Cooldown--;

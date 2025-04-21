@@ -8,7 +8,7 @@ namespace MazeGame.Models.GameTools
         public float Durability { get; set; } = 100.0f;
         public int DamageRadius { get; set; } = 1;
         public double CooldownTime { get; protected set; }
-        public bool IsUsed { get; protected set; } = false;
+        public bool IsActivated { get; protected set; } = false;
         public double Cooldown { get; set; } = 0.0f;
         protected Timer? timer;
 

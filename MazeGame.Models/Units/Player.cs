@@ -5,7 +5,9 @@ namespace MazeGame.Models.Units
     public class Player : Unit
     {
         public List<Key> CollectedKeys { get; set; } = [];
-        public List<Tool> CollectedTools { get; set; } = [];
+        public List<Tool> CollectedTools { get; set; } = [new Explosive(4, 5)];
+        public int MaxCollectedTools { get; set; } = 4;
+        public Tool? ActiveTool { get; set; } = null;
         public override string Name { get; set; }
         public Player(string name)
         {
@@ -27,6 +29,10 @@ namespace MazeGame.Models.Units
         }
         public void AddTool(Tool tool)
         {
+            if (CollectedTools.Count >= MaxCollectedTools)
+            {
+                return;
+            }
             CollectedTools.Add(tool);
         }
     }

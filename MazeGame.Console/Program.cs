@@ -43,11 +43,15 @@ class Program
                 game.MovePlayer(direction);
                 DisplayGameState(game.GameState);
             }
-            else if(key == ConsoleKey.X)
+            else if (key == ConsoleKey.X)
             {
                 Console.Clear();
                 game.UseTool();
                 DisplayGameState(game.GameState);
+            }
+            else
+            {
+                TrySelectTool(key, game);
             }
         }
 
@@ -178,6 +182,30 @@ class Program
                 return true;
             default:
                 direction = Direction.Up;
+                return false;
+        }
+    }
+    private static bool TrySelectTool(ConsoleKey key, Game game)
+    {
+        switch (key)
+        {
+            case ConsoleKey.D1:
+            case ConsoleKey.NumPad1:
+                game.SelectTool(0);
+                return true;
+            case ConsoleKey.D2:
+            case ConsoleKey.NumPad2:
+                game.SelectTool(1);
+                return true;
+            case ConsoleKey.D3:
+            case ConsoleKey.NumPad3:
+                game.SelectTool(2);
+                return true;
+            case ConsoleKey.D4:
+            case ConsoleKey.NumPad4:
+                game.SelectTool(3);
+                return true;
+            default:
                 return false;
         }
     }

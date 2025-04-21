@@ -1,7 +1,9 @@
-﻿using MazeGame.Models;
+﻿using MazeGame.Logic;
+using MazeGame.Models;
 using MazeGame.Models.Enums;
 using MazeGame.Models.GameTools;
 using MazeGame.Models.Units;
+using System.Drawing;
 
 namespace MazeGame
 {
@@ -14,10 +16,11 @@ namespace MazeGame
         private Cell _playerCell;
         private readonly Cell _exitCell;
         private Timer? _timer;
+        private Direction _userDirection = Direction.Up;
 
         public const int DEFAULT_GAME_DURATION = 60;
         public const int TIMER_STEP = 1000;
-        private int _gameDuration;
+        private readonly int _gameDuration;
         private int _currentTime;
 
         public string GameState { get; private set; } = string.Empty;
@@ -29,7 +32,7 @@ namespace MazeGame
         };
         public bool IsGameOver
         {
-            get => _playerCell.Location.Equals(_exitCell.Location) || _exitCell.OccupyingUnit is Player || _currentTime <= 0;
+            get => _playerCell.OccupyingUnit == null || _playerCell.Location.Equals(_exitCell.Location) || _exitCell.OccupyingUnit is Player || _currentTime <= 0;
         }
 
         public Game(int rows, int cols, Action<string, MessageStyle?> print, int gameDuration)
@@ -75,7 +78,7 @@ namespace MazeGame
         }
         public void CheckGameOver()
         {
-            if(_currentTime <= 0)
+            if (_currentTime <= 0)
             {
                 GameState = "Time is up! Game over.";
             }
@@ -83,12 +86,17 @@ namespace MazeGame
             {
                 GameState = "Congratulations! You have reached the exit!";
             }
+            else if (_playerCell.OccupyingUnit == null)
+            {
+                GameState = "Player has died! Game over.";
+            }
         }
         public void MovePlayer(Direction direction)
         {
-            if (IsGameOver) 
+            if (IsGameOver)
                 return;
 
+            _userDirection = direction;
             Location current = _playerCell.Location;
 
             switch (direction)
@@ -117,10 +125,16 @@ namespace MazeGame
                 _playerCell.OccupyingUnit = _player;
             }
 
+            RedrawGameInterface();
+        }
+
+        public void RedrawGameInterface()
+        {
             _maze.PrintMaze(_print);
             PrintPlayerInventory();
             _print($"\nTime left: {_currentTime}", null);
         }
+
         private void CheckNextCellItem(Cell reachedCell)
         {
             Unit? followingUnit = reachedCell.OccupyingUnit;
@@ -149,9 +163,14 @@ namespace MazeGame
             }
             else if (reachedCell.OccupyingUnit is Tool tool)
             {
+                if(tool.IsActivated)
+                {
+                    GameState = $"Tool {tool.Name} is already activated.";
+                    return;
+                }
                 _player.AddTool(tool);
                 reachedCell.OccupyingUnit = null;
-                GameState = $"Found tool {tool.Symbol}.";
+                GameState = $"Found tool {tool.Name}.";
             }
         }
         public void PrintPlayerInventory()
@@ -161,12 +180,13 @@ namespace MazeGame
             if (_player.CollectedKeys.Count == 0)
             {
                 _print("_", null);
-                return;
             }
-
-            foreach (Key key in _player.CollectedKeys)
+            else
             {
-                _print($"{key.Symbol} ", null);
+                foreach (Key key in _player.CollectedKeys)
+                {
+                    _print($"{key.Symbol} ", null);
+                }
             }
 
             _print("\nCollected Tools: ", null);
@@ -174,27 +194,91 @@ namespace MazeGame
             if (_player.CollectedTools.Count == 0)
             {
                 _print("_", null);
+            }
+            else
+            {
+                foreach (Tool tool in _player.CollectedTools)
+                {
+                    _print($"{tool.Symbol} ", null);
+                }
+            }
+        }
+        // public void Explode(Cell explosionEpicenter, int damageRadius)
+        // {
+        //     Location center = explosionEpicenter.Location;
+
+        //     for (int row = center.Row - damageRadius; row <= center.Row + damageRadius; row++)
+        //     {
+        //         for (int col = center.Column - damageRadius; col <= center.Column + damageRadius; col++)
+        //         {
+        //             if (_maze.IsOutOfBounds(row, col)) continue;
+        //             if(row == 0 || col == 0 || row == _maze.Rows - 1 || col == _maze.Columns - 1) continue;
+
+        //             if (_maze[row, col] is Cell targetCell)
+        //             {
+        //                 int distanceSquared = (center.Row - row) * (center.Row - row) + (center.Column - col) * (center.Column - col);
+
+        //                 if (distanceSquared <= damageRadius * damageRadius)
+        //                 {
+        //                     if (targetCell.OccupyingUnit is not Exit)
+        //                     {
+        //                         targetCell.OccupyingUnit = null;
+        //                     }
+        //                 }
+        //             }
+        //         }
+        //     }
+
+        //     _maze.PrintMaze(_print);
+        // }
+        public void SelectTool(int index)
+        {
+            if (IsGameOver)
+                return;
+            if (index < 0 || index >= _player.CollectedTools.Count)
+            {
+                GameState = "Invalid tool selection.";
                 return;
             }
 
-            foreach (Tool tool in _player.CollectedTools)
-            {
-                _print($"{tool.Symbol} ", null);
-            }
+            Tool selectedTool = _player.CollectedTools[index];
+            GameState = $"Selected tool {selectedTool.Name}.";
+            _player.ActiveTool = selectedTool;
         }
-        //private Cell GetToolCell(Location origin)
-        //{
-
-        //}
-        public void Explode(Location explosionEpicenter, int damageRadius)
+        private bool TryPlaceTool(Tool tool, ref Location current)
         {
+            switch (_userDirection)
+            {
+                case Direction.Up:
+                    current.Row--;
+                    break;
+                case Direction.Down:
+                    current.Row++;
+                    break;
+                case Direction.Left:
+                    current.Column--;
+                    break;
+                case Direction.Right:
+                    current.Column++;
+                    break;
+            }
 
+            if (!_maze.CanMove(current))
+                return false;
+
+            Cell toolCell = _maze[current.Row, current.Column];
+
+            if (toolCell.OccupyingUnit != null)
+                return false;
+
+            toolCell.OccupyingUnit = tool;
+
+            return true;
         }
         public void UseTool()
         {
             if (IsGameOver)
                 return;
-
             if (_player.CollectedTools.Count == 0)
             {
                 GameState = "No tools to use.";
@@ -203,29 +287,42 @@ namespace MazeGame
 
             Location current = _playerCell.Location;
 
-            Tool tool = _player.CollectedTools[0];
-            _player.CollectedTools.RemoveAt(0);
+            Tool? tool = _player.ActiveTool;//_player.CollectedTools[0];
 
+            if(tool == null)
+            {
+                GameState = "No tool selected.";
+                return;
+            }
+            if (!TryPlaceTool(tool, ref current))
+            {
+                GameState = $"Tool {tool.Name} cannot be used here.";
+                return;
+            }
+
+            _player.CollectedTools.Remove(tool);
+            Cell toolCell = _maze[current.Row, current.Column];
             tool.Use();
 
             if (tool is Explosive explosive)
             {
-                //explosive.Use();
                 explosive.Exploded += (sender, e) =>
                 {
-                    Explode(current, explosive.DamageRadius);
-                    //_maze.Explode(explosive, current);
+                    if (IsGameOver)
+                        return;
+
+                    GameUtils.Explode(_maze, toolCell, explosive.DamageRadius);
                     GameState = $"Explosive device exploded!";
+                    //explosive.IsUsed = true;
                 };
-                GameState = $"Planted an explosive device!";
+                GameState = $"Planted an explosive device! You have {explosive.CooldownTime} seconds before detonatin.";
             }
             else
             {
-                GameState = $"Used tool {tool.Symbol}.";
+                GameState = $"Used tool {tool.Name}.";
             }
 
-            _maze.PrintMaze(_print);
-            PrintPlayerInventory();
+            RedrawGameInterface();
         }
     }
 }

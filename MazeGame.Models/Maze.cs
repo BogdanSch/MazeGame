@@ -275,35 +275,6 @@ namespace MazeGame.Models
                 }
             }
         }
-        // public Cell? GetUsedToolCell(Tool tool, Location origin)
-        // {
-        //     if (IsOutOfBounds(origin.Row, origin.Column))
-        //         return null;
-
-        //     Location toolLocation = new(origin.Row, origin.Column);
-        //     Cell originCell = Field[origin.Row, origin.Column];
-
-        //     foreach (var dir in _directions)
-        //     {
-        //         int newRow = originCell.Location.Row + dir[0];
-        //         int newCol = originCell.Location.Column + dir[1];
-
-        //         if (IsOutOfBounds(newRow, newCol)) continue;
-        //         if(Field[newRow, newCol].OccupyingUnit != null) continue;
-
-        //         toolLocation.Row = newRow;
-        //         toolLocation.Column = newCol;
-        //         break;
-        //     }
-
-        //     if(origin.Equals(toolLocation))
-        //         return null;
-
-        //     Cell cell = Field[toolLocation.Row, toolLocation.Column];
-        //     cell.OccupyingUnit = tool;
-
-        //     return cell;
-        // }
         public void PrintMaze(Action<string, MessageStyle?> printAction)
         {
             for (int row = 0; row < Rows; row++)

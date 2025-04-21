@@ -203,34 +203,6 @@ namespace MazeGame
                 }
             }
         }
-        // public void Explode(Cell explosionEpicenter, int damageRadius)
-        // {
-        //     Location center = explosionEpicenter.Location;
-
-        //     for (int row = center.Row - damageRadius; row <= center.Row + damageRadius; row++)
-        //     {
-        //         for (int col = center.Column - damageRadius; col <= center.Column + damageRadius; col++)
-        //         {
-        //             if (_maze.IsOutOfBounds(row, col)) continue;
-        //             if(row == 0 || col == 0 || row == _maze.Rows - 1 || col == _maze.Columns - 1) continue;
-
-        //             if (_maze[row, col] is Cell targetCell)
-        //             {
-        //                 int distanceSquared = (center.Row - row) * (center.Row - row) + (center.Column - col) * (center.Column - col);
-
-        //                 if (distanceSquared <= damageRadius * damageRadius)
-        //                 {
-        //                     if (targetCell.OccupyingUnit is not Exit)
-        //                     {
-        //                         targetCell.OccupyingUnit = null;
-        //                     }
-        //                 }
-        //             }
-        //         }
-        //     }
-
-        //     _maze.PrintMaze(_print);
-        // }
         public void SelectTool(int index)
         {
             if (IsGameOver)
@@ -272,7 +244,6 @@ namespace MazeGame
                 return false;
 
             toolCell.OccupyingUnit = tool;
-
             return true;
         }
         public void UseTool()
@@ -287,7 +258,7 @@ namespace MazeGame
 
             Location current = _playerCell.Location;
 
-            Tool? tool = _player.ActiveTool;//_player.CollectedTools[0];
+            Tool? tool = _player.ActiveTool;
 
             if(tool == null)
             {
@@ -301,6 +272,7 @@ namespace MazeGame
             }
 
             _player.CollectedTools.Remove(tool);
+            _player.ActiveTool = null;
             Cell toolCell = _maze[current.Row, current.Column];
             tool.Use();
 
@@ -313,7 +285,6 @@ namespace MazeGame
 
                     GameUtils.Explode(_maze, toolCell, explosive.DamageRadius);
                     GameState = $"Explosive device exploded!";
-                    //explosive.IsUsed = true;
                 };
                 GameState = $"Planted an explosive device! You have {explosive.CooldownTime} seconds before detonatin.";
             }
@@ -321,8 +292,6 @@ namespace MazeGame
             {
                 GameState = $"Used tool {tool.Name}.";
             }
-
-            RedrawGameInterface();
         }
     }
 }

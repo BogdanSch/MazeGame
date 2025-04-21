@@ -47,6 +47,7 @@ class Program
             {
                 Console.Clear();
                 game.UseTool();
+                game.RedrawGameInterface();
                 DisplayGameState(game.GameState);
             }
             else

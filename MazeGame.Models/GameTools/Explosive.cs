@@ -7,6 +7,8 @@
         {
             Name = GetType().Name;
             Symbol = '!';
+            MessageStyle = new("Red");
+            Durability = 100.0f;
             DamageRadius = damageRadius;
             CooldownTime = cooldownTime;
             Cooldown = CooldownTime;
@@ -23,11 +25,15 @@
                 timer?.Dispose();
                 Exploded?.Invoke(this, EventArgs.Empty);
                 Exploded = null;
-                Durability = 0;
+                Durability = 0f;
                 //IsUsed = true;
                 return;
             }
             Cooldown--;
+        }
+        public override void Acivate(Cell cell)
+        {
+            throw new NotImplementedException();
         }
     }
 }

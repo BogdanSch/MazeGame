@@ -31,9 +31,9 @@
             }
             Cooldown--;
         }
-        public override void Acivate(Cell cell)
-        {
-            throw new NotImplementedException();
-        }
+        //public override void Acivate(Cell cell)
+        //{
+        //    throw new NotImplementedException();
+        //}
     }
 }

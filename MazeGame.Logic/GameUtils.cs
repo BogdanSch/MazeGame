@@ -5,10 +5,7 @@ namespace MazeGame.Logic
 {
     public static class GameUtils
     {
-        private static int GetSquaredDistance(Location a, int row, int col)
-        {
-            return (a.Row - row) * (a.Row - row) + (a.Column - col) * (a.Column - col);
-        }
+        private static int GetSquaredDistance(Location a, int row, int col) => (a.Row - row) * (a.Row - row) + (a.Column - col) * (a.Column - col);
         public static void Explode(Maze maze, Cell explosionEpicenter, int damageRadius)
         {
             Location center = explosionEpicenter.Location;

@@ -9,6 +9,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MazeGame.Console", "..\Maze
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MazeGame.Logic", "..\MazeGame.Logic\MazeGame.Logic.csproj", "{5F21342F-61CF-41A9-98C0-5635AD08F50B}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MazeGame.WinForms", "..\MazeGame.WinForms\MazeGame.WinForms.csproj", "{97017773-72D8-434A-9D1F-87198177B753}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -27,6 +29,10 @@ Global
 		{5F21342F-61CF-41A9-98C0-5635AD08F50B}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{5F21342F-61CF-41A9-98C0-5635AD08F50B}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{5F21342F-61CF-41A9-98C0-5635AD08F50B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{97017773-72D8-434A-9D1F-87198177B753}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{97017773-72D8-434A-9D1F-87198177B753}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{97017773-72D8-434A-9D1F-87198177B753}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{97017773-72D8-434A-9D1F-87198177B753}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

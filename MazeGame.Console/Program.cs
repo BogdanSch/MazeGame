@@ -1,4 +1,4 @@
-﻿using MazeGame;
+﻿using MazeGame.Logic;
 using MazeGame.Models;
 using MazeGame.Models.Enums;
 
@@ -93,17 +93,17 @@ class Program
         {
             case ConsoleKey.D1:
             case ConsoleKey.NumPad1:
-                (gameDurationSeconds, rowsCount, colsCount) = Game.DifficultyLevels["Easy"];
+                (rowsCount, colsCount, gameDurationSeconds) = Game.DifficultyLevels["Easy"].GetGameDifficulty();
                 break;
 
             case ConsoleKey.D2:
             case ConsoleKey.NumPad2:
-                (gameDurationSeconds, rowsCount, colsCount) = Game.DifficultyLevels["Medium"];
+                (rowsCount, colsCount, gameDurationSeconds) = Game.DifficultyLevels["Medium"].GetGameDifficulty();
                 break;
 
             case ConsoleKey.D3:
             case ConsoleKey.NumPad3:
-                (gameDurationSeconds, rowsCount, colsCount) = Game.DifficultyLevels["Hard"];
+                (rowsCount, colsCount, gameDurationSeconds) = Game.DifficultyLevels["Hard"].GetGameDifficulty();
                 break;
 
             case ConsoleKey.D4:

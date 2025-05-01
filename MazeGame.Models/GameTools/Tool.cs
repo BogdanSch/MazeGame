@@ -13,7 +13,7 @@ namespace MazeGame.Models.GameTools
         protected Timer? timer;
 
         public abstract void Use();
-        public abstract void Acivate(Cell cell);
+        //public abstract void Acivate(Cell cell);
         public virtual void Repair()
         {
             if (Durability < 100.0f)

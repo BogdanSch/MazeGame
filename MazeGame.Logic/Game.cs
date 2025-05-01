@@ -1,17 +1,29 @@
-﻿using MazeGame.Logic;
-using MazeGame.Models;
+﻿using MazeGame.Models;
 using MazeGame.Models.Enums;
 using MazeGame.Models.GameTools;
 using MazeGame.Models.Units;
-using System.Drawing;
+using System.Text;
 
-namespace MazeGame
+namespace MazeGame.Logic
 {
     public class Game
     {
-        private readonly Action<string, MessageStyle?> _print;
+
+        private readonly Action<string> _updateInventory;
+        private readonly Action<string> _updateTimer;
 
         private readonly Maze _maze;
+        public Cell[,] MazeCells
+        {
+            get
+            {
+                Cell[,] fieldCopy = new Cell[_maze.Rows, _maze.Columns];
+                _maze.Field.CopyTo(fieldCopy, 0);
+                //Array.Copy(_maze.Field, fieldCopy);
+                return fieldCopy;
+            }
+        }
+
         private readonly Player _player;
         private Cell _playerCell;
         private readonly Cell _exitCell;
@@ -24,23 +36,25 @@ namespace MazeGame
         private int _currentTime;
 
         public string GameState { get; private set; } = string.Empty;
-        public readonly static Dictionary<string, (int gameDurationSeconds, int rowsCount, int colsCount)> DifficultyLevels = new()
+        public readonly static Dictionary<string, GameDifficulty> DifficultyLevels = new()
         {
-            {"Easy", (90, 11, 11)},
-            {"Medium", (70, 15, 15)},
-            {"Hard", (60, 19, 27)},
+            {"Easy", new GameDifficulty(11, 11, 90)},
+            {"Medium", new GameDifficulty(15, 15, 70)},
+            {"Hard", new GameDifficulty(19, 27, 60)},
         };
         public bool IsGameOver
         {
             get => _playerCell.OccupyingUnit == null || _playerCell.Location.Equals(_exitCell.Location) || _exitCell.OccupyingUnit is Player || _currentTime <= 0;
         }
 
-        public Game(int rows, int cols, Action<string, MessageStyle?> print, int gameDuration)
+        public Game(int rows, int cols, Action<string> updateInventory, Action<string> updateTimer, int gameDuration)
         {
             _maze = new Maze(rows, cols);
             _maze.GenerateMaze();
 
-            _print = print;
+            //_print = print;
+            _updateInventory = updateInventory;
+            _updateTimer = updateTimer;
 
             _gameDuration = gameDuration;
             _currentTime = gameDuration;
@@ -53,14 +67,13 @@ namespace MazeGame
             _exitCell = _maze[rows - 2, cols - 1];
             _exitCell.OccupyingUnit = exit;
 
-            _maze.PrintMaze(print);
+            //_maze.PrintMaze(print);
             PrintPlayerInventory();
         }
-        public Game(Action<string, MessageStyle?> print, int gameDuration)
-            : this(Maze.DEFAULT_ROWS_COUNT, Maze.DEFAULT_COLS_COUNT, print, gameDuration) { }
-        public Game(Action<string, MessageStyle?> print)
-            : this(Maze.DEFAULT_ROWS_COUNT, Maze.DEFAULT_COLS_COUNT, print, DEFAULT_GAME_DURATION) { }
-
+        public Game(Action<string> updateInventory, Action<string> updateTimer, int gameDuration)
+            : this(Maze.DEFAULT_ROWS_COUNT, Maze.DEFAULT_COLS_COUNT, updateInventory, updateTimer, gameDuration) { }
+        public Game(Action<string> updateInventory, Action<string> updateTimer)
+            : this(Maze.DEFAULT_ROWS_COUNT, Maze.DEFAULT_COLS_COUNT, updateInventory, updateTimer, DEFAULT_GAME_DURATION) { }
         public void StartGame()
         {
             _currentTime = _gameDuration;
@@ -75,6 +88,7 @@ namespace MazeGame
                 return;
             }
             _currentTime--;
+            _updateTimer($"Time left: {_currentTime}");
         }
         public void CheckGameOver()
         {
@@ -127,14 +141,14 @@ namespace MazeGame
 
             RedrawGameInterface();
         }
-
         public void RedrawGameInterface()
         {
-            _maze.PrintMaze(_print);
+            //_maze.PrintMaze(_print);
             PrintPlayerInventory();
-            _print($"\nTime left: {_currentTime}", null);
+            _updateInventory(GameState);
+            _updateTimer($"Time left: {_currentTime}");
+            //_print($"\nTime left: {_currentTime}", null);
         }
-
         private void CheckNextCellItem(Cell reachedCell)
         {
             Unit? followingUnit = reachedCell.OccupyingUnit;
@@ -175,33 +189,36 @@ namespace MazeGame
         }
         public void PrintPlayerInventory()
         {
-            _print("\nCollected Keys: ", null);
+            StringBuilder inventory = new();
+            inventory.Append("\nCollected Keys: ");
 
             if (_player.CollectedKeys.Count == 0)
             {
-                _print("_", null);
+                inventory.Append("_");
             }
             else
             {
                 foreach (Key key in _player.CollectedKeys)
                 {
-                    _print($"{key.Symbol} ", null);
+                    inventory.Append($"{key.Symbol} ");
                 }
             }
 
-            _print("\nCollected Tools: ", null);
+            inventory.Append("\nCollected Tools: ");
 
             if (_player.CollectedTools.Count == 0)
             {
-                _print("_", null);
+                inventory.Append("_");
             }
             else
             {
                 foreach (Tool tool in _player.CollectedTools)
                 {
-                    _print($"{tool.Symbol} ", null);
+                    inventory.Append($"{tool.Symbol} ");
                 }
             }
+
+            _updateInventory(inventory.ToString());
         }
         public void SelectTool(int index)
         {

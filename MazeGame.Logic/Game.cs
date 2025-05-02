@@ -13,14 +13,15 @@ namespace MazeGame.Logic
         private readonly Action<string> _updateTimer;
 
         private readonly Maze _maze;
-        public Cell[,] MazeCells
+        public Cell[,] MazeGrid
         {
             get
             {
-                Cell[,] fieldCopy = new Cell[_maze.Rows, _maze.Columns];
-                _maze.Field.CopyTo(fieldCopy, 0);
-                //Array.Copy(_maze.Field, fieldCopy);
-                return fieldCopy;
+                //Cell[,] fieldCopy = new Cell[_maze.Rows, _maze.Columns];
+                //_maze.Field.Clone();
+                ////Array.Copy(_maze.Field, fieldCopy);
+                //return fieldCopy;
+                return _maze.Field;
             }
         }
 
@@ -145,7 +146,7 @@ namespace MazeGame.Logic
         {
             //_maze.PrintMaze(_print);
             PrintPlayerInventory();
-            _updateInventory(GameState);
+            //_updateInventory(GameState);
             _updateTimer($"Time left: {_currentTime}");
             //_print($"\nTime left: {_currentTime}", null);
         }

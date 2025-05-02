@@ -16,6 +16,7 @@ namespace MazeGame.Models
         private static readonly string[] _colors = ["Red", "Green", "Blue", "Magenta", "Cyan", "DarkGreen", "DarkCyan"];
 
         public Cell[,] Field { get; set; }
+        public Cell[,] FieldCopy => (Cell[,])Field.Clone();
         public int Rows { get; private set; }
         public int Columns { get; private set; }
         public int DoorsCount { get => (int)Math.Floor(Rows / 5.0); }

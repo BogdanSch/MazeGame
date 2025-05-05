@@ -1,6 +1,7 @@
 ﻿using MazeGame.Logic;
 using MazeGame.Models;
 using MazeGame.Models.Enums;
+using MazeGame.Models.Units;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -15,7 +16,7 @@ namespace MazeGame.WinForms
 {
     public partial class MainForm : Form
     {
-        public const int CELL_SIZE = 30;
+        public const int CELL_SIZE = 36;
         private Game? _game;
         public MainForm()
         {
@@ -33,7 +34,7 @@ namespace MazeGame.WinForms
                 int colsCount = configureGameForm.ColsCount;
                 _game = new Game(rowsCount, colsCount, DisplayInventory, DisplayLeftTime, gameDurationSeconds);
                 _game.StartGame();
-                CreateMazeGridLayout();
+                CreateMazeGrid();
             }
             else
             {
@@ -41,7 +42,12 @@ namespace MazeGame.WinForms
                 Close();
             }
         }
-        public void CreateMazeGridLayout()
+        public void UpdateMazeGrid()
+        {
+            gridPanel.Controls.Clear();
+            CreateMazeGrid();
+        }
+        public void CreateMazeGrid()
         {
             if (_game == null)
             {
@@ -56,13 +62,15 @@ namespace MazeGame.WinForms
                 for (int col = 0; col < _game.MazeGrid.GetLength(0); col++)
                 {
                     Cell cell = mazeGrid[row, col];
-                    Label cellLabel = new Label();
-                    cellLabel.Size = new Size(CELL_SIZE, CELL_SIZE);
-                    cellLabel.BackColor = Color.White;
-                    cellLabel.ForeColor = Color.Black;
-                    cellLabel.Text = cell.ToString();
-                    cellLabel.TextAlign = ContentAlignment.MiddleCenter;
-                    cellLabel.Location = new Point(col * CELL_SIZE, row * CELL_SIZE);
+                    Label cellLabel = new()
+                    {
+                        Size = new Size(CELL_SIZE, CELL_SIZE),
+                        BackColor = Color.White,
+                        ForeColor = Color.Black,
+                        Text = cell.ToString(),
+                        TextAlign = ContentAlignment.MiddleCenter,
+                        Location = new Point(col * CELL_SIZE, row * CELL_SIZE)
+                    };
                     gridPanel.Controls.Add(cellLabel);
                 }
             }
@@ -70,12 +78,10 @@ namespace MazeGame.WinForms
         private void DisplayGameState(string gameState)
         {
             SafeInvoke(() => gameStatusLabel.Text = gameState);
-            //gameStatusLabel.Text = gameState;
         }
         public void DisplayInventory(string inventory) 
         {
             SafeInvoke(() => playerInventoryLabel.Text = inventory);
-            //playerInventoryLabel.Text = inventory;
         }
         public void DisplayLeftTime(string timeLeft)
         {
@@ -92,27 +98,43 @@ namespace MazeGame.WinForms
         {
             if (_game == null) return;
 
-            _game.MovePlayer(Direction.Up);
+
+            if (TryConvertKeyToDirection(e.KeyCode, out Direction direction))
+            {
+                _game.MovePlayer(direction);
+            }
+            else if (e.KeyCode == Keys.X)
+            {
+                _game.UseTool();
+                //DisplayGameState(_game.GameState);
+            }
+            else
+            {
+                TrySelectTool(e.KeyCode);
+            }
+
+            //_game.MovePlayer(Direction.Up);
+            UpdateMazeGrid();
             DisplayGameState(_game.GameState);
         }
-        private bool TryConvertKeyToDirection(ConsoleKey key, out Direction direction)
+        private bool TryConvertKeyToDirection(Keys key, out Direction direction)
         {
             switch (key)
             {
-                case ConsoleKey.W:
-                case ConsoleKey.UpArrow:
+                case Keys.W:
+                case Keys.Up:
                     direction = Direction.Up;
                     return true;
-                case ConsoleKey.S:
-                case ConsoleKey.DownArrow:
+                case Keys.S:
+                case Keys.Down:
                     direction = Direction.Down;
                     return true;
-                case ConsoleKey.A:
-                case ConsoleKey.LeftArrow:
+                case Keys.A:
+                case Keys.Left:
                     direction = Direction.Left;
                     return true;
-                case ConsoleKey.D:
-                case ConsoleKey.RightArrow:
+                case Keys.D:
+                case Keys.Right:
                     direction = Direction.Right;
                     return true;
                 default:
@@ -120,25 +142,27 @@ namespace MazeGame.WinForms
                     return false;
             }
         }
-        private static bool TrySelectTool(ConsoleKey key, Game game)
+        private bool TrySelectTool(Keys key)
         {
+            if (_game == null) return false;
+
             switch (key)
             {
-                case ConsoleKey.D1:
-                case ConsoleKey.NumPad1:
-                    game.SelectTool(0);
+                case Keys.D1:
+                case Keys.NumPad1:
+                    _game.SelectTool(0);
                     return true;
-                case ConsoleKey.D2:
-                case ConsoleKey.NumPad2:
-                    game.SelectTool(1);
+                case Keys.D2:
+                case Keys.NumPad2:
+                    _game.SelectTool(1);
                     return true;
-                case ConsoleKey.D3:
-                case ConsoleKey.NumPad3:
-                    game.SelectTool(2);
+                case Keys.D3:
+                case Keys.NumPad3:
+                    _game.SelectTool(2);
                     return true;
-                case ConsoleKey.D4:
-                case ConsoleKey.NumPad4:
-                    game.SelectTool(3);
+                case Keys.D4:
+                case Keys.NumPad4:
+                    _game.SelectTool(3);
                     return true;
                 default:
                     return false;

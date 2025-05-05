@@ -77,6 +77,7 @@ namespace MazeGame.Logic
             : this(Maze.DEFAULT_ROWS_COUNT, Maze.DEFAULT_COLS_COUNT, updateInventory, updateTimer, DEFAULT_GAME_DURATION) { }
         public void StartGame()
         {
+            GameState = "The game has stated!";
             _currentTime = _gameDuration;
             _timer = new Timer(TimerCallback, null, 0, TIMER_STEP);
         }

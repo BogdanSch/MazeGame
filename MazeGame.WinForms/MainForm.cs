@@ -1,16 +1,6 @@
 ﻿using MazeGame.Logic;
 using MazeGame.Models;
 using MazeGame.Models.Enums;
-using MazeGame.Models.Units;
-using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows.Forms;
 
 namespace MazeGame.WinForms
 {
@@ -18,6 +8,7 @@ namespace MazeGame.WinForms
     {
         public const int CELL_SIZE = 36;
         private Game? _game;
+        private Label[,]? _gridLabels;
         public MainForm()
         {
             InitializeComponent();
@@ -29,12 +20,17 @@ namespace MazeGame.WinForms
 
             if (result == DialogResult.OK)
             {
+
                 int gameDurationSeconds = configureGameForm.GameDurationSeconds;
                 int rowsCount = configureGameForm.RowsCount;
                 int colsCount = configureGameForm.ColsCount;
+
+                _gridLabels = new Label[rowsCount, colsCount];
                 _game = new Game(rowsCount, colsCount, DisplayInventory, DisplayLeftTime, gameDurationSeconds);
                 _game.StartGame();
                 CreateMazeGrid();
+
+                WindowState = FormWindowState.Maximized;
             }
             else
             {
@@ -44,12 +40,7 @@ namespace MazeGame.WinForms
         }
         public void UpdateMazeGrid()
         {
-            gridPanel.Controls.Clear();
-            CreateMazeGrid();
-        }
-        public void CreateMazeGrid()
-        {
-            if (_game == null)
+            if(_game == null || _gridLabels == null)
             {
                 MessageBox.Show("Game is not initialized.");
                 return;
@@ -59,18 +50,52 @@ namespace MazeGame.WinForms
 
             for (int row = 0; row < _game.MazeGrid.GetLength(0); row++)
             {
-                for (int col = 0; col < _game.MazeGrid.GetLength(0); col++)
+                for (int col = 0; col < _game.MazeGrid.GetLength(1); col++)
                 {
+                    Color textColor = Color.Black;
                     Cell cell = mazeGrid[row, col];
+                    Label cellLabel = _gridLabels[row, col];
+
+                    cellLabel.Text = cell.ToString();
+
+                    MessageStyle? messageStyle = cell.OccupyingUnit?.MessageStyle;
+                    if (messageStyle != null) textColor = Color.FromName(messageStyle.ColorName);
+
+                    cellLabel.ForeColor = textColor;
+                }
+            }
+        }
+        public void CreateMazeGrid()
+        {
+            if (_game == null || _gridLabels == null)
+            {
+                MessageBox.Show("Game is not initialized.");
+                return;
+            }
+
+            Cell[,] mazeGrid = _game.MazeGrid;
+
+            for (int row = 0; row < _game.MazeGrid.GetLength(0); row++)
+            {
+                for (int col = 0; col < _game.MazeGrid.GetLength(1); col++)
+                {
+                    Color textColor = Color.Black;
+                    Cell cell = mazeGrid[row, col];
+
+                    MessageStyle? messageStyle = cell.OccupyingUnit?.MessageStyle;
                     Label cellLabel = new()
                     {
                         Size = new Size(CELL_SIZE, CELL_SIZE),
-                        BackColor = Color.White,
-                        ForeColor = Color.Black,
+                        BackColor = Color.DarkGray,
                         Text = cell.ToString(),
                         TextAlign = ContentAlignment.MiddleCenter,
                         Location = new Point(col * CELL_SIZE, row * CELL_SIZE)
                     };
+
+                    if (messageStyle != null) textColor = Color.FromName(messageStyle.ColorName);
+                    cellLabel.ForeColor = textColor;
+
+                    _gridLabels[row, col] = cellLabel;
                     gridPanel.Controls.Add(cellLabel);
                 }
             }
@@ -90,7 +115,7 @@ namespace MazeGame.WinForms
         public void SafeInvoke(Action action)
         {
             if (InvokeRequired)
-                Invoke(action);
+                this?.Invoke(action);
             else
                 action();
         }
@@ -106,18 +131,16 @@ namespace MazeGame.WinForms
             else if (e.KeyCode == Keys.X)
             {
                 _game.UseTool();
-                //DisplayGameState(_game.GameState);
             }
             else
             {
                 TrySelectTool(e.KeyCode);
             }
 
-            //_game.MovePlayer(Direction.Up);
             UpdateMazeGrid();
             DisplayGameState(_game.GameState);
         }
-        private bool TryConvertKeyToDirection(Keys key, out Direction direction)
+        private static bool TryConvertKeyToDirection(Keys key, out Direction direction)
         {
             switch (key)
             {
@@ -168,6 +191,5 @@ namespace MazeGame.WinForms
                     return false;
             }
         }
-
     }
 }

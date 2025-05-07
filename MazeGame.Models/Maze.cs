@@ -19,7 +19,7 @@ namespace MazeGame.Models
         public Cell[,] FieldCopy => (Cell[,])Field.Clone();
         public int Rows { get; private set; }
         public int Columns { get; private set; }
-        public int DoorsCount { get => (int)Math.Floor(Rows / 5.0); }
+        public int DoorsCount { get => (int)Math.Ceiling(Rows / 5.0); }
 
         public Maze(int rows, int columns)
         {

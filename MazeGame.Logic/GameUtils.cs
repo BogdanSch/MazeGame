@@ -25,6 +25,7 @@ namespace MazeGame.Logic
                         Cell targetCell = maze[row, col];
 
                         if (targetCell.OccupyingUnit is Exit) continue;
+                        if (targetCell.OccupyingUnit is Key) continue;
                         targetCell.OccupyingUnit = null;
                     }
                 }

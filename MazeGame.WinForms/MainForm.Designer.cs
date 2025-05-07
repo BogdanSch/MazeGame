@@ -28,6 +28,7 @@
         /// </summary>
         private void InitializeComponent()
         {
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(MainForm));
             gameStatusLabel = new Label();
             playerInventoryLabel = new Label();
             timeLeftLabel = new Label();
@@ -110,6 +111,9 @@
             AutoScaleMode = AutoScaleMode.Font;
             ClientSize = new Size(912, 495);
             Controls.Add(tableLayout);
+            Icon = (Icon)resources.GetObject("$this.Icon");
+            MaximizeBox = false;
+            MinimizeBox = false;
             Name = "MainForm";
             Text = "The Maze";
             Load += MainForm_Load;

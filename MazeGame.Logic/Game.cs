@@ -53,7 +53,6 @@ namespace MazeGame.Logic
             _maze = new Maze(rows, cols);
             _maze.GenerateMaze();
 
-            //_print = print;
             _updateInventory = updateInventory;
             _updateTimer = updateTimer;
 
@@ -68,7 +67,6 @@ namespace MazeGame.Logic
             _exitCell = _maze[rows - 2, cols - 1];
             _exitCell.OccupyingUnit = exit;
 
-            //_maze.PrintMaze(print);
             PrintPlayerInventory();
         }
         public Game(Action<string> updateInventory, Action<string> updateTimer, int gameDuration)
@@ -188,6 +186,10 @@ namespace MazeGame.Logic
                 reachedCell.OccupyingUnit = null;
                 GameState = $"Found tool {tool.Name}.";
             }
+            else if(reachedCell.OccupyingUnit is Exit)
+            {
+                GameState = "You have reached the exit!";
+            }
         }
         public void PrintPlayerInventory()
         {
@@ -267,8 +269,7 @@ namespace MazeGame.Logic
         }
         public void UseTool()
         {
-            if (IsGameOver)
-                return;
+            if (IsGameOver) return;
             if (_player.CollectedTools.Count == 0)
             {
                 GameState = "No tools to use.";

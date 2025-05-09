@@ -17,10 +17,6 @@ namespace MazeGame.Logic
         {
             get
             {
-                //Cell[,] fieldCopy = new Cell[_maze.Rows, _maze.Columns];
-                //_maze.Field.Clone();
-                ////Array.Copy(_maze.Field, fieldCopy);
-                //return fieldCopy;
                 return _maze.Field;
             }
         }
@@ -68,6 +64,11 @@ namespace MazeGame.Logic
             _exitCell.OccupyingUnit = exit;
 
             PrintPlayerInventory();
+        }
+        ~Game()
+        {
+            GameState = "The game has been stopped!";
+            _timer?.Dispose();
         }
         public Game(Action<string> updateInventory, Action<string> updateTimer, int gameDuration)
             : this(Maze.DEFAULT_ROWS_COUNT, Maze.DEFAULT_COLS_COUNT, updateInventory, updateTimer, gameDuration) { }

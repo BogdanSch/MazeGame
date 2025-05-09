@@ -28,6 +28,7 @@
         /// </summary>
         private void InitializeComponent()
         {
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(ConfigureGameForm));
             difficultyLabel = new Label();
             titleLabel = new Label();
             difficultyComboBox = new ComboBox();
@@ -98,10 +99,12 @@
             Controls.Add(titleLabel);
             Controls.Add(difficultyLabel);
             FormBorderStyle = FormBorderStyle.FixedDialog;
+            Icon = (Icon)resources.GetObject("$this.Icon");
+            MaximizeBox = false;
             MaximumSize = new Size(520, 560);
             MinimumSize = new Size(520, 560);
             Name = "ConfigureGameForm";
-            Text = "ConfigureGame";
+            Text = "The Maze Configuration";
             FormClosing += ConfigureGameForm_FormClosing;
             ResumeLayout(false);
             PerformLayout();

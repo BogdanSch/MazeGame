@@ -113,11 +113,11 @@
             Controls.Add(tableLayout);
             Icon = (Icon)resources.GetObject("$this.Icon");
             MaximizeBox = false;
-            MinimizeBox = false;
             Name = "MainForm";
             Text = "The Maze";
             Load += MainForm_Load;
             KeyDown += MainForm_KeyDown;
+            KeyUp += MainForm_KeyUp;
             tableLayout.ResumeLayout(false);
             tableLayout.PerformLayout();
             ResumeLayout(false);

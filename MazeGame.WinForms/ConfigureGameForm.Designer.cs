@@ -59,7 +59,7 @@
             difficultyComboBox.DropDownHeight = 200;
             difficultyComboBox.FormattingEnabled = true;
             difficultyComboBox.IntegralHeight = false;
-            difficultyComboBox.Items.AddRange(new object[] { "Easy  ->  Duration: 90s | Maze: 11x11", "Medium  ->  Duration: 70s  | Maze: 15x15", "Hard  ->  Duration: 60s  | Maze: 19x27", "Custom  ->  Choose your own settings" });
+            difficultyComboBox.Items.AddRange(new object[] { "Easy  ->  Duration: 90s | Maze: 11x11", "Medium  ->  Duration: 70s  | Maze: 15x15", "Difficult  ->  Duration: 60s  | Maze: 19x27", "Hardcore ->  Duration: 65s  | Maze: 21x29", "Custom  ->  Choose your own settings" });
             difficultyComboBox.Location = new Point(106, 195);
             difficultyComboBox.Name = "difficultyComboBox";
             difficultyComboBox.Size = new Size(292, 28);

@@ -5,9 +5,11 @@ namespace MazeGame.WinForms
 {
     public partial class ConfigureGameForm : Form
     {
-        public int GameDurationSeconds;
-        public int RowsCount;
-        public int ColsCount;
+        public int GameDurationSeconds = Game.DEFAULT_GAME_DURATION;
+        public int RowsCount = Maze.DEFAULT_ROWS_COUNT;
+        public int ColsCount = Maze.DEFAULT_COLS_COUNT;
+        public bool InversedControls = false;
+
         public ConfigureGameForm()
         {
             InitializeComponent();
@@ -18,20 +20,21 @@ namespace MazeGame.WinForms
             //string comboBoxValue = difficultyComboBox.Text;
             int difficultyIndex = difficultyComboBox.SelectedIndex;
 
-            GameDurationSeconds = Game.DEFAULT_GAME_DURATION;
-            RowsCount = Maze.DEFAULT_ROWS_COUNT;
-            ColsCount = Maze.DEFAULT_COLS_COUNT;
-
             switch (difficultyIndex)
             {
                 case 0:
-                    (RowsCount, ColsCount, GameDurationSeconds) = Game.DifficultyLevels["Easy"].GetGameDifficulty();
+                    (RowsCount, ColsCount, GameDurationSeconds, InversedControls) = Game.DifficultyLevels["Easy"].GetGameDifficulty();
                     break;
                 case 1:
-                    (RowsCount, ColsCount, GameDurationSeconds) = Game.DifficultyLevels["Medium"].GetGameDifficulty();
+                    (RowsCount, ColsCount, GameDurationSeconds, InversedControls) = Game.DifficultyLevels["Medium"].GetGameDifficulty();
                     break;
                 case 2:
-                    (RowsCount, ColsCount, GameDurationSeconds) = Game.DifficultyLevels["Hard"].GetGameDifficulty();
+                    (RowsCount, ColsCount, GameDurationSeconds, InversedControls) = Game.DifficultyLevels["Difficult"].GetGameDifficulty();
+                    break;
+                case 3:
+                    (RowsCount, ColsCount, GameDurationSeconds, InversedControls) = Game.DifficultyLevels["Hardcore"].GetGameDifficulty();
+                    break;
+                case 4:
                     break;
                 default:
                     MessageBox.Show("Invalid difficulty level selected.");

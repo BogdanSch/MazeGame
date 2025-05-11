@@ -12,10 +12,12 @@ namespace MazeGame.WinForms
         public Color WALL_CELL_COLOR = Color.DimGray;
         public Color DEFAULT_CELL_COLOR = Color.Silver;
         public Color INTERACTABLE_CELL_COLOR = Color.Khaki;
+        public Color EXIT_CELL_COLOR = Color.Aqua;
 
         private Game? _game;
         private Label[,]? _labelsGrid;
         private bool _keyHeld = false;
+        private bool _inversedControls = false;
         public MainForm()
         {
             InitializeComponent();
@@ -32,6 +34,7 @@ namespace MazeGame.WinForms
                 int gameDurationSeconds = configureGameForm.GameDurationSeconds;
                 int rowsCount = configureGameForm.RowsCount;
                 int colsCount = configureGameForm.ColsCount;
+                _inversedControls = configureGameForm.InversedControls;
 
                 _labelsGrid = new Label[rowsCount, colsCount];
                 _game = new Game(rowsCount, colsCount, DisplayInventory, DisplayLeftTime, gameDurationSeconds);
@@ -119,6 +122,10 @@ namespace MazeGame.WinForms
             {
                 cellLabel.BackColor = INTERACTABLE_CELL_COLOR;
             }
+            else if(occupyingUnit is Exit)
+            {
+                cellLabel.BackColor = EXIT_CELL_COLOR;
+            }
             else
             {
                 cellLabel.BackColor = DEFAULT_CELL_COLOR;
@@ -169,25 +176,25 @@ namespace MazeGame.WinForms
             UpdateMazeGrid();
             DisplayGameState(_game.GameState);
         }
-        private static bool TryConvertKeyToDirection(Keys key, out Direction direction)
+        private bool TryConvertKeyToDirection(Keys key, out Direction direction)
         {
             switch (key)
             {
                 case Keys.W:
                 case Keys.Up:
-                    direction = Direction.Up;
+                    direction = _inversedControls ? Direction.Down : Direction.Up;
                     return true;
                 case Keys.S:
                 case Keys.Down:
-                    direction = Direction.Down;
+                    direction = _inversedControls ? Direction.Up : Direction.Down;
                     return true;
                 case Keys.A:
                 case Keys.Left:
-                    direction = Direction.Left;
+                    direction = _inversedControls ? Direction.Right : Direction.Left;
                     return true;
                 case Keys.D:
                 case Keys.Right:
-                    direction = Direction.Right;
+                    direction = _inversedControls ? Direction.Left : Direction.Right;
                     return true;
                 default:
                     direction = Direction.Up;

@@ -37,7 +37,8 @@ namespace MazeGame.Logic
         {
             {"Easy", new GameDifficulty(11, 11, 90)},
             {"Medium", new GameDifficulty(15, 15, 70)},
-            {"Hard", new GameDifficulty(19, 27, 60)},
+            {"Difficult", new GameDifficulty(19, 27, 60)},
+            {"Hardcore", new GameDifficulty(21, 29, 65, true)},
         };
         public bool IsGameOver
         {

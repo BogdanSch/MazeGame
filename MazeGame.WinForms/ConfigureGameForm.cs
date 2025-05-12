@@ -17,7 +17,6 @@ namespace MazeGame.WinForms
 
         private void difficultyComboBox_SelectedIndexChanged(object sender, EventArgs e)
         {
-            //string comboBoxValue = difficultyComboBox.Text;
             int difficultyIndex = difficultyComboBox.SelectedIndex;
 
             switch (difficultyIndex)
@@ -35,28 +34,51 @@ namespace MazeGame.WinForms
                     (RowsCount, ColsCount, GameDurationSeconds, InversedControls) = Game.DifficultyLevels["Hardcore"].GetGameDifficulty();
                     break;
                 case 4:
+                    configTableLayout.Visible = true;
                     break;
                 default:
                     MessageBox.Show("Invalid difficulty level selected.");
                     break;
             }
-            //MessageBox.Show(comboBoxValue);
         }
 
         private void startBtn_Click(object sender, EventArgs e)
         {
-            this.DialogResult = DialogResult.OK;
+            if (configTableLayout.Visible)
+            {
+                GameDurationSeconds = Convert.ToInt32(gameDurationNumeric.Value);
+                RowsCount = Convert.ToInt32(mazeRowsNumeric.Value);
+                ColsCount = Convert.ToInt32(mazeColumnsNumeric.Value);
+                InversedControls = inversedModeCheckBox.Checked;
+            }
+            DialogResult = DialogResult.OK;
         }
 
         private void exitBtn_Click(object sender, EventArgs e)
         {
-            this.DialogResult = DialogResult.Cancel;
+            DialogResult = DialogResult.Cancel;
         }
 
         private void ConfigureGameForm_FormClosing(object sender, FormClosingEventArgs e)
         {
-            if(DialogResult == DialogResult.None)
-                this.DialogResult = DialogResult.Cancel;
+            if (DialogResult == DialogResult.None)
+                DialogResult = DialogResult.Cancel;
+        }
+
+        private void mazeDimensionNumeric_ValueChanged(object sender, EventArgs e)
+        {
+            NumericUpDown? numericUpDown = sender as NumericUpDown;
+
+            if(numericUpDown == null)
+            {
+                MessageBox.Show("Invalid numeric up down control.");
+                return;
+            }
+
+            int value = (int)numericUpDown.Value;
+            if(value % 2 == 0) value++;
+
+            numericUpDown.Value = value;
         }
     }
 }

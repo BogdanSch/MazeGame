@@ -99,6 +99,7 @@
             // gridPanel
             // 
             gridPanel.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
+            gridPanel.AutoScroll = true;
             tableLayout.SetColumnSpan(gridPanel, 3);
             gridPanel.Location = new Point(3, 3);
             gridPanel.Name = "gridPanel";

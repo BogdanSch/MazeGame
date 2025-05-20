@@ -8,6 +8,7 @@ namespace MazeGame.WinForms
 {
     public partial class MainForm : Form
     {
+        public Font LargeFont = new("Segoe UI", 14);
         public const int CELL_SIZE = 36;
         public Color WALL_CELL_COLOR = Color.DimGray;
         public Color DEFAULT_CELL_COLOR = Color.Silver;
@@ -18,26 +19,34 @@ namespace MazeGame.WinForms
         private Label[,]? _labelsGrid;
         private bool _keyHeld = false;
         private bool _inversedControls = false;
+        private GameDifficulty? _currentGameDifficulty;
         public MainForm()
         {
             InitializeComponent();
-            MinimumSize = this.MaximumSize;
+            MinimumSize = MaximumSize;
             SizeGripStyle = SizeGripStyle.Hide;
         }
         private void MainForm_Load(object sender, EventArgs e)
+        {
+            InitializeGame();
+        }
+        private void MainForm_FormClosing(object sender, FormClosingEventArgs e)
+        {
+            if(_game == null) return;
+            GC.Collect();
+        }
+        private void InitializeGame()
         {
             using ConfigureGameForm configureGameForm = new();
             DialogResult result = configureGameForm.ShowDialog();
 
             if (result == DialogResult.OK)
             {
-                int gameDurationSeconds = configureGameForm.GameDurationSeconds;
-                int rowsCount = configureGameForm.RowsCount;
-                int colsCount = configureGameForm.ColsCount;
+                _currentGameDifficulty = configureGameForm.GameDifficulty;
                 _inversedControls = configureGameForm.InversedControls;
 
-                _labelsGrid = new Label[rowsCount, colsCount];
-                _game = new Game(rowsCount, colsCount, DisplayInventory, DisplayLeftTime, gameDurationSeconds);
+                _labelsGrid = new Label[_currentGameDifficulty.RowsCount, _currentGameDifficulty.ColsCount];
+                _game = new Game(_currentGameDifficulty, DisplayInventory, DisplayLeftTime);
                 _game.StartGame();
                 CreateMazeGrid();
 
@@ -82,6 +91,8 @@ namespace MazeGame.WinForms
 
             Cell[,] mazeGrid = _game.MazeGrid;
 
+            gridPanel.Controls.Clear();
+
             for (int row = 0; row < _game.MazeGrid.GetLength(0); row++)
             {
                 for (int col = 0; col < _game.MazeGrid.GetLength(1); col++)
@@ -93,6 +104,7 @@ namespace MazeGame.WinForms
                         Size = new Size(CELL_SIZE, CELL_SIZE),
                         BackColor = DEFAULT_CELL_COLOR,
                         Text = cell.ToString(),
+                        Font = LargeFont,
                         TextAlign = ContentAlignment.MiddleCenter,
                         Location = new Point(col * CELL_SIZE, row * CELL_SIZE)
                     };
@@ -118,11 +130,11 @@ namespace MazeGame.WinForms
                 cellLabel.BackColor = WALL_CELL_COLOR;
                 cellLabel.Text = string.Empty;
             }
-            else if(occupyingUnit is Key || occupyingUnit is Door || occupyingUnit is Tool)
+            else if (occupyingUnit is Key || occupyingUnit is Door || occupyingUnit is Tool)
             {
                 cellLabel.BackColor = INTERACTABLE_CELL_COLOR;
             }
-            else if(occupyingUnit is Exit)
+            else if (occupyingUnit is Exit)
             {
                 cellLabel.BackColor = EXIT_CELL_COLOR;
             }
@@ -133,7 +145,7 @@ namespace MazeGame.WinForms
         }
         private void DisplayGameState(string gameState)
         {
-            SafeInvoke(() => gameStatusLabel.Text = gameState);
+            gameStatusLabel.Text = gameState;
         }
         public void DisplayInventory(string inventory)
         {
@@ -153,7 +165,7 @@ namespace MazeGame.WinForms
         private void MainForm_KeyDown(object sender, KeyEventArgs e)
         {
             if (_game == null) return;
-            if(_keyHeld)
+            if (_keyHeld)
             {
                 e.Handled = true;
                 return;
@@ -175,6 +187,11 @@ namespace MazeGame.WinForms
 
             UpdateMazeGrid();
             DisplayGameState(_game.GameState);
+
+            if (_game.IsGameOver)
+            {
+                HandleGameOver();
+            }
         }
         private bool TryConvertKeyToDirection(Keys key, out Direction direction)
         {
@@ -227,10 +244,30 @@ namespace MazeGame.WinForms
                     return false;
             }
         }
-
         private void MainForm_KeyUp(object sender, KeyEventArgs e)
         {
             _keyHeld = false;
+        }
+        private void HandleGameOver()
+        {
+            if (_game == null || !_game.IsGameOver) return;
+
+            using GameOverForm gameOverForm = new();
+            gameOverForm.Player = _game.Player;
+            gameOverForm.PlayerScore = _game.Score;
+            gameOverForm.LeaderboardManager = _game.LeaderboardManager;
+            gameOverForm.StartPosition = FormStartPosition.CenterParent;
+            DialogResult result = gameOverForm.ShowDialog(this);
+
+            if (result == DialogResult.OK)
+            {
+                InitializeGame();
+            }
+            else
+            {
+                MessageBox.Show("Exiting the game!");
+                Close();
+            }
         }
     }
 }

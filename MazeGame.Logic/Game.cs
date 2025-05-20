@@ -2,13 +2,14 @@
 using MazeGame.Models.Enums;
 using MazeGame.Models.GameTools;
 using MazeGame.Models.Units;
+using System.Security.Cryptography;
 using System.Text;
+using System.Text.Json;
 
 namespace MazeGame.Logic
 {
     public class Game
     {
-
         private readonly Action<string> _updateInventory;
         private readonly Action<string> _updateTimer;
 
@@ -20,19 +21,25 @@ namespace MazeGame.Logic
                 return _maze.Field;
             }
         }
+        public LeaderboardManager LeaderboardManager = new();
 
         private readonly Player _player;
+        public Player Player { get => _player; }
         private Cell _playerCell;
-        private readonly Cell _exitCell;
-        private Timer? _timer;
         private Direction _userDirection = Direction.Up;
+        private readonly Cell _exitCell;
 
-        public const int DEFAULT_GAME_DURATION = 60;
+        private Timer? _timer;
         public const int TIMER_STEP = 1000;
         private readonly int _gameDuration;
         private int _currentTime;
+        public const int DEFAULT_GAME_DURATION = 60;
 
-        public string GameState { get; private set; } = string.Empty;
+        public const int POINTS_RATE = 10;
+        public const int PARTICIPATION_REWARD = 70;
+        public const int MAZE_SIZE_MULTIPLIER = 3;
+        public const int INVERSED_MODE_EXTRA_REWARD = 1200;
+
         public readonly static Dictionary<string, GameDifficulty> DifficultyLevels = new()
         {
             {"Easy", new GameDifficulty(11, 11, 90)},
@@ -40,28 +47,44 @@ namespace MazeGame.Logic
             {"Difficult", new GameDifficulty(19, 27, 60)},
             {"Hardcore", new GameDifficulty(21, 29, 65, true)},
         };
+        public GameDifficulty Difficulty { get; private set; }
+        public string GameState { get; private set; } = string.Empty;
         public bool IsGameOver
         {
             get => _playerCell.OccupyingUnit == null || _playerCell.Location.Equals(_exitCell.Location) || _exitCell.OccupyingUnit is Player || _currentTime <= 0;
         }
-
-        public Game(int rows, int cols, Action<string> updateInventory, Action<string> updateTimer, int gameDuration)
+        public int Score
         {
-            _maze = new Maze(rows, cols);
+            get
+            {
+                int timeBonus = Math.Max(0, _gameDuration - _currentTime);
+                int reward = PARTICIPATION_REWARD + timeBonus * POINTS_RATE;
+
+                reward += (Difficulty.RowsCount + Difficulty.ColsCount) * MAZE_SIZE_MULTIPLIER;
+                if (Difficulty.InversedControls)
+                    reward += INVERSED_MODE_EXTRA_REWARD;
+
+                return reward;
+            }
+        }
+        public Game(GameDifficulty difficulty, Action<string> updateInventory, Action<string> updateTimer)
+        {
+            Difficulty = difficulty;
+            _maze = new Maze(difficulty.RowsCount, difficulty.ColsCount);
             _maze.GenerateMaze();
 
             _updateInventory = updateInventory;
             _updateTimer = updateTimer;
 
-            _gameDuration = gameDuration;
-            _currentTime = gameDuration;
+            _gameDuration = difficulty.GameDurationSeconds;
+            _currentTime = difficulty.GameDurationSeconds;
 
             _player = new Player("Player");
             _playerCell = _maze[1, 1];
             _playerCell.OccupyingUnit = _player;
 
             Exit exit = new();
-            _exitCell = _maze[rows - 2, cols - 1];
+            _exitCell = _maze[difficulty.RowsCount - 2, difficulty.ColsCount - 1];
             _exitCell.OccupyingUnit = exit;
 
             PrintPlayerInventory();
@@ -71,10 +94,6 @@ namespace MazeGame.Logic
             GameState = "The game has been stopped!";
             _timer?.Dispose();
         }
-        public Game(Action<string> updateInventory, Action<string> updateTimer, int gameDuration)
-            : this(Maze.DEFAULT_ROWS_COUNT, Maze.DEFAULT_COLS_COUNT, updateInventory, updateTimer, gameDuration) { }
-        public Game(Action<string> updateInventory, Action<string> updateTimer)
-            : this(Maze.DEFAULT_ROWS_COUNT, Maze.DEFAULT_COLS_COUNT, updateInventory, updateTimer, DEFAULT_GAME_DURATION) { }
         public void StartGame()
         {
             GameState = "The game has stated!";

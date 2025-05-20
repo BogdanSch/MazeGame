@@ -116,6 +116,7 @@
             MaximizeBox = false;
             Name = "MainForm";
             Text = "The Maze";
+            FormClosing += MainForm_FormClosing;
             Load += MainForm_Load;
             KeyDown += MainForm_KeyDown;
             KeyUp += MainForm_KeyUp;

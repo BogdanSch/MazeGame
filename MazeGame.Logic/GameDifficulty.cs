@@ -18,7 +18,7 @@
         public GameDifficulty(int rowsCount, int colsCount, int gameDurationSeconds, bool inversedControl) : this(string.Empty, rowsCount, colsCount, gameDurationSeconds, inversedControl) { }
         public GameDifficulty(int rowsCount, int colsCount, int gameDurationSeconds) : this (string.Empty, rowsCount, colsCount, gameDurationSeconds, false) { }
 
-        public (int rowsCount, int colsCount, int gameDurationSeconds, bool invertedControls) GetGameDifficulty()
+        public (int rowsCount, int colsCount, int gameDurationSeconds, bool invertedControls) GetGameDifficultyProperties()
         {
             return (RowsCount, ColsCount, GameDurationSeconds, InversedControls);
         }

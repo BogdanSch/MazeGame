@@ -43,6 +43,7 @@
             mazeRowsNumeric = new NumericUpDown();
             lblRows = new Label();
             inversedModeCheckBox = new CheckBox();
+            LblHint = new Label();
             ((System.ComponentModel.ISupportInitialize)gameDurationNumeric).BeginInit();
             configTableLayout.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)mazeColumnsNumeric).BeginInit();
@@ -52,18 +53,20 @@
             // difficultyLabel
             // 
             difficultyLabel.AutoSize = true;
-            difficultyLabel.Location = new Point(172, 160);
+            difficultyLabel.Font = new Font("Segoe UI Semibold", 10.2F, FontStyle.Bold, GraphicsUnit.Point, 0);
+            difficultyLabel.Location = new Point(172, 169);
             difficultyLabel.Name = "difficultyLabel";
-            difficultyLabel.Size = new Size(146, 20);
+            difficultyLabel.Size = new Size(167, 23);
             difficultyLabel.TabIndex = 0;
             difficultyLabel.Text = "Select difficulty level";
             // 
             // titleLabel
             // 
             titleLabel.AutoSize = true;
-            titleLabel.Location = new Point(172, 38);
+            titleLabel.Font = new Font("Segoe UI", 18F, FontStyle.Bold, GraphicsUnit.Point, 0);
+            titleLabel.Location = new Point(90, 25);
             titleLabel.Name = "titleLabel";
-            titleLabel.Size = new Size(157, 20);
+            titleLabel.Size = new Size(328, 41);
             titleLabel.TabIndex = 1;
             titleLabel.Text = "Welcome to The Maze";
             // 
@@ -86,7 +89,7 @@
             startBtn.Name = "startBtn";
             startBtn.Size = new Size(94, 29);
             startBtn.TabIndex = 3;
-            startBtn.Text = "Start";
+            startBtn.Text = "Play";
             startBtn.UseVisualStyleBackColor = true;
             startBtn.Click += startBtn_Click;
             // 
@@ -116,6 +119,7 @@
             // 
             lblDuration.AutoSize = true;
             lblDuration.Dock = DockStyle.Fill;
+            lblDuration.Font = new Font("Segoe UI Semibold", 9F, FontStyle.Bold);
             lblDuration.Location = new Point(3, 0);
             lblDuration.Name = "lblDuration";
             lblDuration.Size = new Size(158, 41);
@@ -150,6 +154,7 @@
             // 
             lblInversedControls.AutoSize = true;
             lblInversedControls.Dock = DockStyle.Fill;
+            lblInversedControls.Font = new Font("Segoe UI Semibold", 9F, FontStyle.Bold);
             lblInversedControls.Location = new Point(3, 123);
             lblInversedControls.Name = "lblInversedControls";
             lblInversedControls.Size = new Size(158, 43);
@@ -161,18 +166,19 @@
             mazeColumnsNumeric.Dock = DockStyle.Fill;
             mazeColumnsNumeric.Increment = new decimal(new int[] { 2, 0, 0, 0 });
             mazeColumnsNumeric.Location = new Point(167, 85);
-            mazeColumnsNumeric.Maximum = new decimal(new int[] { 51, 0, 0, 0 });
-            mazeColumnsNumeric.Minimum = new decimal(new int[] { 1, 0, 0, 0 });
+            mazeColumnsNumeric.Maximum = new decimal(new int[] { 55, 0, 0, 0 });
+            mazeColumnsNumeric.Minimum = new decimal(new int[] { 11, 0, 0, 0 });
             mazeColumnsNumeric.Name = "mazeColumnsNumeric";
             mazeColumnsNumeric.Size = new Size(159, 27);
             mazeColumnsNumeric.TabIndex = 10;
-            mazeColumnsNumeric.Value = new decimal(new int[] { 1, 0, 0, 0 });
+            mazeColumnsNumeric.Value = new decimal(new int[] { 11, 0, 0, 0 });
             mazeColumnsNumeric.ValueChanged += mazeDimensionNumeric_ValueChanged;
             // 
             // lblColumns
             // 
             lblColumns.AutoSize = true;
             lblColumns.Dock = DockStyle.Fill;
+            lblColumns.Font = new Font("Segoe UI Semibold", 9F, FontStyle.Bold);
             lblColumns.Location = new Point(3, 82);
             lblColumns.Name = "lblColumns";
             lblColumns.Size = new Size(158, 41);
@@ -185,17 +191,18 @@
             mazeRowsNumeric.Increment = new decimal(new int[] { 2, 0, 0, 0 });
             mazeRowsNumeric.Location = new Point(167, 44);
             mazeRowsNumeric.Maximum = new decimal(new int[] { 119, 0, 0, 0 });
-            mazeRowsNumeric.Minimum = new decimal(new int[] { 1, 0, 0, 0 });
+            mazeRowsNumeric.Minimum = new decimal(new int[] { 11, 0, 0, 0 });
             mazeRowsNumeric.Name = "mazeRowsNumeric";
             mazeRowsNumeric.Size = new Size(159, 27);
             mazeRowsNumeric.TabIndex = 8;
-            mazeRowsNumeric.Value = new decimal(new int[] { 1, 0, 0, 0 });
+            mazeRowsNumeric.Value = new decimal(new int[] { 11, 0, 0, 0 });
             mazeRowsNumeric.ValueChanged += mazeDimensionNumeric_ValueChanged;
             // 
             // lblRows
             // 
             lblRows.AutoSize = true;
             lblRows.Dock = DockStyle.Fill;
+            lblRows.Font = new Font("Segoe UI Semibold", 9F, FontStyle.Bold);
             lblRows.Location = new Point(3, 41);
             lblRows.Name = "lblRows";
             lblRows.Size = new Size(158, 41);
@@ -206,6 +213,7 @@
             // 
             inversedModeCheckBox.AutoSize = true;
             inversedModeCheckBox.Dock = DockStyle.Fill;
+            inversedModeCheckBox.Font = new Font("Segoe UI Semibold", 9F, FontStyle.Bold, GraphicsUnit.Point, 0);
             inversedModeCheckBox.Location = new Point(167, 126);
             inversedModeCheckBox.Name = "inversedModeCheckBox";
             inversedModeCheckBox.Size = new Size(159, 37);
@@ -213,11 +221,21 @@
             inversedModeCheckBox.Text = "Inversed mode";
             inversedModeCheckBox.UseVisualStyleBackColor = true;
             // 
+            // LblHint
+            // 
+            LblHint.Location = new Point(50, 66);
+            LblHint.Name = "LblHint";
+            LblHint.Size = new Size(402, 66);
+            LblHint.TabIndex = 8;
+            LblHint.Text = "Navigate through the maze. Collect treasures. Avoid traps. Controls: Arrow Keys  or  W A S D. To use a tool press X. Compete with other players. Press Start to begin your adventure!";
+            LblHint.TextAlign = ContentAlignment.MiddleCenter;
+            // 
             // ConfigureGameForm
             // 
             AutoScaleDimensions = new SizeF(8F, 20F);
             AutoScaleMode = AutoScaleMode.Font;
             ClientSize = new Size(502, 513);
+            Controls.Add(LblHint);
             Controls.Add(configTableLayout);
             Controls.Add(exitBtn);
             Controls.Add(startBtn);
@@ -257,5 +275,6 @@
         private NumericUpDown mazeColumnsNumeric;
         private Label lblInversedControls;
         private CheckBox inversedModeCheckBox;
+        private Label LblHint;
     }
 }

@@ -4,6 +4,7 @@ namespace MazeGame.Models.Units
 {
     public class Player : Unit
     {
+        public int Score { get; set; } = 0;
         public List<Key> CollectedKeys { get; set; } = [];
         public List<Tool> CollectedTools { get; set; } = [];
         public int MaxCollectedTools { get; set; } = 4;

@@ -5,6 +5,7 @@ namespace MazeGame.WinForms
 {
     public partial class ConfigureGameForm : Form
     {
+        public GameDifficulty GameDifficulty = Game.DifficultyLevels["Easy"];
         public int GameDurationSeconds = Game.DEFAULT_GAME_DURATION;
         public int RowsCount = Maze.DEFAULT_ROWS_COUNT;
         public int ColsCount = Maze.DEFAULT_COLS_COUNT;
@@ -14,24 +15,29 @@ namespace MazeGame.WinForms
         {
             InitializeComponent();
         }
-
         private void difficultyComboBox_SelectedIndexChanged(object sender, EventArgs e)
         {
             int difficultyIndex = difficultyComboBox.SelectedIndex;
 
+            configTableLayout.Visible = false;
+
             switch (difficultyIndex)
             {
                 case 0:
-                    (RowsCount, ColsCount, GameDurationSeconds, InversedControls) = Game.DifficultyLevels["Easy"].GetGameDifficulty();
+                    GameDifficulty = Game.DifficultyLevels["Easy"];
+                    (RowsCount, ColsCount, GameDurationSeconds, InversedControls) = GameDifficulty.GetGameDifficultyProperties();
                     break;
                 case 1:
-                    (RowsCount, ColsCount, GameDurationSeconds, InversedControls) = Game.DifficultyLevels["Medium"].GetGameDifficulty();
+                    GameDifficulty = Game.DifficultyLevels["Medium"];
+                    (RowsCount, ColsCount, GameDurationSeconds, InversedControls) = GameDifficulty.GetGameDifficultyProperties();
                     break;
                 case 2:
-                    (RowsCount, ColsCount, GameDurationSeconds, InversedControls) = Game.DifficultyLevels["Difficult"].GetGameDifficulty();
+                    GameDifficulty = Game.DifficultyLevels["Difficult"];
+                    (RowsCount, ColsCount, GameDurationSeconds, InversedControls) = GameDifficulty.GetGameDifficultyProperties();
                     break;
                 case 3:
-                    (RowsCount, ColsCount, GameDurationSeconds, InversedControls) = Game.DifficultyLevels["Hardcore"].GetGameDifficulty();
+                    GameDifficulty = Game.DifficultyLevels["Hardcore"];
+                    (RowsCount, ColsCount, GameDurationSeconds, InversedControls) = GameDifficulty.GetGameDifficultyProperties();
                     break;
                 case 4:
                     configTableLayout.Visible = true;
@@ -50,7 +56,9 @@ namespace MazeGame.WinForms
                 RowsCount = Convert.ToInt32(mazeRowsNumeric.Value);
                 ColsCount = Convert.ToInt32(mazeColumnsNumeric.Value);
                 InversedControls = inversedModeCheckBox.Checked;
+                GameDifficulty = new GameDifficulty(RowsCount, ColsCount, GameDurationSeconds, InversedControls);
             }
+
             DialogResult = DialogResult.OK;
         }
 

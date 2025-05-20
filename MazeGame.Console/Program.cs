@@ -93,17 +93,17 @@ class Program
         {
             case ConsoleKey.D1:
             case ConsoleKey.NumPad1:
-                (rowsCount, colsCount, gameDurationSeconds) = Game.DifficultyLevels["Easy"].GetGameDifficulty();
+                (rowsCount, colsCount, gameDurationSeconds) = Game.DifficultyLevels["Easy"].GetGameDifficultyProperties();
                 break;
 
             case ConsoleKey.D2:
             case ConsoleKey.NumPad2:
-                (rowsCount, colsCount, gameDurationSeconds) = Game.DifficultyLevels["Medium"].GetGameDifficulty();
+                (rowsCount, colsCount, gameDurationSeconds) = Game.DifficultyLevels["Medium"].GetGameDifficultyProperties();
                 break;
 
             case ConsoleKey.D3:
             case ConsoleKey.NumPad3:
-                (rowsCount, colsCount, gameDurationSeconds) = Game.DifficultyLevels["Hard"].GetGameDifficulty();
+                (rowsCount, colsCount, gameDurationSeconds) = Game.DifficultyLevels["Hard"].GetGameDifficultyProperties();
                 break;
 
             case ConsoleKey.D4:
